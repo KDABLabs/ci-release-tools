@@ -1,0 +1,11 @@
+version = 1
+SPDX-PackageName = "ci-release-tools"
+SPDX-PackageSupplier = "<info@kdab.com>"
+SPDX-PackageDownloadLocation = "https://www.github.com/KDABLabs/ci-release-tools"
+
+#misc FILES
+[[annotations]]
+path = ["README.md", "REUSE.toml", "LICENSE.txt", ".pre-commit-config.yaml"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>"
+SPDX-License-Identifier = "MIT"
