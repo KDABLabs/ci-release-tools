@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2024 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
+# SPDX-License-Identifier: MIT
+
+name: Test scripts
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run gh_utils test
+        run: python gh_utils.py KDAB/KDDockWidgets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
