@@ -28,7 +28,7 @@ def get_latest_release_tag_in_github(repo):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--get-latest-release',
+    parser.add_argument('--get-latest-release', metavar='REPO',
                         help="returns latest release for a repo")
     args = parser.parse_args()
     if args.get_latest_release:
