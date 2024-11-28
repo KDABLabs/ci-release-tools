@@ -10,7 +10,7 @@
 # v2.1.0
 
 import argparse
-from utils import run_command_with_output
+from .utils import run_command_with_output
 
 # Returns the tag of latest release
 # repo is for example 'KDAB/KDReports'
