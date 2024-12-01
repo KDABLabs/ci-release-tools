@@ -48,7 +48,8 @@ signed_release = true
 has_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
-homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
+# uncomment after official release
+# homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
 [project.KDSingleApplication]
 signed_release = true
@@ -76,7 +77,7 @@ signed_release = false
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
-homebrew = ["kdalgorithms.rb"]
+# homebrew = ["kdalgorithms.rb"] # uncomment after 1.3 release
 
 [project.KDUtils]
 signed_release = false
