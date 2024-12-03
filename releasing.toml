@@ -15,10 +15,12 @@
 #   be subject to automated submodule bump.
 # - has_fetchcontent
 #   Same purpose as 'has_submodules'
-#
 # - homebrew
 #   Points to the homebrew formula. consumed by our KDAB/homebrew-tap scripts
-
+# - tag_prefix
+#   If empty, 'v' is used
+#   Some projects have tags prefixed with their name, for example tag 'kdsoap-x.y.z'
+#   we can't normalized this now, as it would break package urls.
 
 [project]
 
@@ -27,6 +29,7 @@ signed_release = true
 has_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
+tag_prefix = "kdsoap-"
 homebrew = ["kdsoap-qt5.rb", "kdsoap-qt6.rb"]
 
 [project.KDReports]
@@ -34,6 +37,7 @@ signed_release = true
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
+tag_prefix = "kdreports-"
 homebrew = ["kdreports-qt5.rb", "kdreports-qt6.rb"]
 
 [project.KDDockWidgets]
