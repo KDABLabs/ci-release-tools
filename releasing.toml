@@ -81,7 +81,7 @@ signed_release = false
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
-# homebrew = ["kdalgorithms.rb"] # uncomment after 1.3 release
+homebrew = ["kdalgorithms.rb"]
 
 [project.KDUtils]
 signed_release = false
