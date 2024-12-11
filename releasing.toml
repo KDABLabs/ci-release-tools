@@ -69,6 +69,13 @@ has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
 
+[project.KDChart]
+signed_release = true
+has_submodules = false
+has_fetchcontent = false
+automated_3rdparty_updates = false
+homebrew = ["kdchart-qt5.rb", "kdchart-qt6.rb"]
+
 [project.KDBindings]
 signed_release = false
 has_submodules = false
