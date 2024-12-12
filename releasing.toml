@@ -31,6 +31,7 @@ has_fetchcontent = false
 automated_3rdparty_updates = false
 tag_prefix = "kdsoap-"
 homebrew = ["kdsoap-qt5.rb", "kdsoap-qt6.rb"]
+main_branch = "master"
 
 [project.KDReports]
 signed_release = true
@@ -39,60 +40,77 @@ has_fetchcontent = false
 automated_3rdparty_updates = false
 tag_prefix = "kdreports-"
 homebrew = ["kdreports-qt5.rb", "kdreports-qt6.rb"]
+main_branch = "master"
 
 [project.KDDockWidgets]
+tag_prefix = "v"
 signed_release = true
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = true
 homebrew = ["kddockwidgets-qt5.rb", "kddockwidgets-qt6.rb"]
+main_branch = "main"
 
 [project.KDStateMachineEditor]
+tag_prefix = "v"
 signed_release = true
 has_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
+main_branch = "master"
 # uncomment after official release
 # homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
 [project.KDSingleApplication]
+tag_prefix = "v"
 signed_release = true
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["kdsingleapplication-qt5.rb", "kdsingleapplication-qt6.rb"]
+main_branch = "master"
 
 [project.Gammaray]
+tag_prefix = "v"
 signed_release = true
 has_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
+main_branch = "master"
 
 [project.KDChart]
+tag_prefix = "v"
 signed_release = true
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["kdchart-qt5.rb", "kdchart-qt6.rb"]
+main_branch = "master"
 
 [project.KDBindings]
+tag_prefix = "v"
 signed_release = false
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["kdbindings.rb"]
+main_branch = "main"
 
 [project.KDAlgorithms]
+tag_prefix = ""
 signed_release = false
 has_submodules = false
 has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["kdalgorithms.rb"]
+main_branch = "main"
 
 [project.KDUtils]
+tag_prefix = "v"
 signed_release = false
 has_submodules = false
 has_fetchcontent = true
 automated_3rdparty_updates = false
 homebrew = ["kdutils.rb"]
+main_branch = "main"
