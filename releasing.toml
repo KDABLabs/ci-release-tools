@@ -58,8 +58,7 @@ has_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
 main_branch = "master"
-# uncomment after official release
-# homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
+homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
 [project.KDSingleApplication]
 tag_prefix = "v"
