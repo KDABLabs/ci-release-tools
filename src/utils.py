@@ -16,9 +16,13 @@ def exit_because(reason):
     sys.exit(1)
 
 # runs a command but doesn't print to stdout/stderr
+
+
 def run_command_silent(command):
-    result = subprocess.run(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    result = subprocess.run(
+        command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return result.returncode == 0
+
 
 def run_command(command, fatal=True):
     if os.system(command) == 0:
@@ -34,8 +38,10 @@ def run_command_with_output(command):
     output = os.popen(command).read()
     return output
 
+
 def repo_exists(repo):
     return repo in get_projects()
+
 
 def get_projects():
     script_path = os.path.dirname(__file__)
@@ -45,6 +51,8 @@ def get_projects():
     return None
 
 # example: get_project('KDReports')
+
+
 def get_project(name):
     projects = get_projects()
     if name not in projects:

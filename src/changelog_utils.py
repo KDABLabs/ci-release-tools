@@ -3,12 +3,10 @@
 # SPDX-FileCopyrightText: 2024 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
 # SPDX-License-Identifier: MIT
 
-from utils import downloadFileAsString, exit_because, get_project
-import re
+from utils import downloadFileAsString
 
-def get_kddockwidgets_changelog(version):
-
-    filename = "https://raw.githubusercontent.com/KDAB/KDDockWidgets/refs/heads/main/Changelog"
+def get_kddockwidgets_changelog(version, sha1):
+    filename = f"https://raw.githubusercontent.com/KDAB/KDDockWidgets/{sha1}/Changelog"
     text = downloadFileAsString(filename)
 
     sections = text.split('* v')
@@ -18,10 +16,9 @@ def get_kddockwidgets_changelog(version):
     return ""
 
 # Gets the changelog for the specified version
-# The file needs to be in main/master branch
-def get_changelog(proj_name, version):
-    proj = get_project(proj_name)
+def get_changelog(proj_name, version, sha1):
     if proj_name == 'KDDockWidgets':
-        return get_kddockwidgets_changelog(version)
+        return get_kddockwidgets_changelog(version, sha1)
 
-    raise Exception(f"Don't know how to get changelog for project {proj_name}. IMPLEMENT ME")
+    raise Exception(
+        f"Don't know how to get changelog for project {proj_name}. IMPLEMENT ME")

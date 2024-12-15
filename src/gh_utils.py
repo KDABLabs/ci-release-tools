@@ -80,6 +80,15 @@ def create_release(repo, tag, notes):
 
     return True
 
+def ci_run_status(proj_name, sha1):
+    print("run: " + f"gh run list --commit {sha1} --json status,name")
+    output = run_command_with_output(f"gh run list -R KDAB/{proj_name} --commit {sha1} --json status,name")
+    in_progress = "in_progress" in output
+    completed = "completed" in output
+    failed = "failure" in output or "timed_out" in output or "cancelled" in output
+
+    return in_progress, completed, failed
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--get-latest-release', metavar='REPO',
