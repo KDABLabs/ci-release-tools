@@ -43,3 +43,23 @@ def get_projects():
         toml_content = tomllib.load(f)
         return toml_content['project']
     return None
+
+# example: get_project('KDReports')
+def get_project(name):
+    projects = get_projects()
+    if name not in projects:
+        exit_because(f"Project {name} does not exist")
+    return projects[name]
+
+
+# Downloads a file and returns it as a string
+def downloadFileAsString(filename):
+    import urllib.request
+    result = ""
+    try:
+        with urllib.request.urlopen(filename) as response:
+            result = response.read().decode('utf-8')
+    except Exception as e:
+        exit_because(f"Failed to download changelog: {e}")
+
+    return result
