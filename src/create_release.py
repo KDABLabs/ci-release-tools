@@ -5,7 +5,7 @@
 
 # Creates a GitHub release
 # example usage
-# ./src/create_release.py --repo KDAlgorithms --version 1.4 --sha1 1fcdd65fb2dc46b67f238e6fee33ae7973421016 --repo-path ../KDDockWidgets/
+# ./src/create_release.py --repo KDAlgorithms --version 1.4 --sha1 1fcdd65fb2dc46b67f238e6fee33ae7973421016 --repo-path ../KDDockWidgets/ [--sign]
 
 import sys
 import os
@@ -18,6 +18,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--repo", help="GitHub repository name", required=True)
 parser.add_argument("--version", help="Release version", required=True)
 parser.add_argument("--sha1", help="Sha1 for tagging", required=True)
+parser.add_argument("--sign", help="Sign the tag",
+                    action="store_true", required=False)
 parser.add_argument(
     "--repo-path", help="Path for repo being released", required=True)
 
@@ -35,4 +37,4 @@ if not release_notes:
     sys.exit(1)
 
 gh_utils.create_release(args.repo, args.version,
-                        args.sha1, release_notes, args.repo_path)
+                        args.sha1, release_notes, args.repo_path, args.sign)

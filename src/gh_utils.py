@@ -122,7 +122,7 @@ def release_exists(repo, tag):
     return run_command_silent(f"gh release view {tag} --repo KDAB/{repo}")
 
 
-def create_release(repo, version, sha1, notes, repo_path, should_create_tag=True):
+def create_release(repo, version, sha1, notes, repo_path, should_sign, should_create_tag=True):
     tag = tag_for_version(repo, version)
     if not repo_exists(repo):
         print(f"error: unknown repo {repo}, check releasing.toml")
@@ -154,15 +154,19 @@ def create_release(repo, version, sha1, notes, repo_path, should_create_tag=True
         print(f"error: Tarball {tarball} is corrupted")
         return False
 
-    if not sign_file(tarball):
-        print(f"error: Failed to sign {tarball}")
-        return False
+    files_to_upload = ""
+    if should_sign:
+        if not sign_file(tarball):
+            print(f"error: Failed to sign {tarball}")
+            return False
+        files_to_upload = f"{tarball}.asc {tarball}"
+    else:
+        files_to_upload = f"{tarball}"
 
     cmd = f"gh release create {tag} " \
         f"--repo KDAB/{repo} " \
         f'--title "Release {tag}" ' \
-        f'--notes "{notes}" ' \
-        f"{tarball}.asc {tarball}"
+        f'--notes "{notes}" ' + files_to_upload
 
     if not run_command(cmd):
         print("error: Could not create release")
