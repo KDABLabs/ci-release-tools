@@ -71,3 +71,8 @@ def download_file_as_string(filename):
         exit_because(f"Failed to download changelog: {e}")
 
     return result
+
+
+def tag_for_version(proj_name, version):
+    proj = get_project(proj_name)
+    return f"{proj['tag_prefix']}{version}"
