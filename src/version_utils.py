@@ -3,10 +3,8 @@
 # SPDX-FileCopyrightText: 2024 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
 # SPDX-License-Identifier: MIT
 
-from changelog_utils import get_changelog
-from utils import download_file_as_string, get_project
-from gh_utils import tag_exists, ci_run_status
 import re
+from utils import download_file_as_string
 
 # example:
 # 2.1.1 -> 2.1.0
@@ -76,51 +74,3 @@ def is_numeric(version):
         return True
     except:
         return False
-
-# Returns True if we can bump to the specified version
-# Reasons not to, include:
-    # - The previous semantic tag doesn't exist
-    # - Version in CMake doesn't match
-    # - Changelog entry doesn't exist
-    # - CI has failures
-
-
-def can_bump_to(proj_name, version, sha1, check_ci=True):
-    if not is_numeric(version):
-        print("Do not pass versions with prefixes")
-        return False
-
-    prev = previous_version(version)
-    proj = get_project(proj_name)
-    tag_prefix = proj['tag_prefix']
-
-    new_tag = f"{tag_prefix}{version}"
-    prev_tag = f"{tag_prefix}{prev}"
-    if prev != '0.0.0' and not tag_exists(proj_name, prev_tag):
-        print(f"Error: Can't tag {new_tag} without {prev_tag}")
-        return False
-
-    if not get_changelog(proj_name, version, sha1):
-        print(f"Error: No changelog found for version {version}")
-        return False
-
-    cur_cmake_version = get_current_version_in_cmake(proj_name, sha1)
-    if cur_cmake_version != version:
-        print(
-            f"You need to bump the version in CMakeLists.txt, currently it's at {cur_cmake_version}")
-        return False
-
-    ci_in_progress, ci_completed, ci_failed = ci_run_status(proj_name, sha1)
-    if ci_in_progress:
-        print("CI is still running, please try again later")
-        return False
-
-    if ci_failed:
-        print(f"CI has failed jobs for sha1 {sha1}")
-        return False
-
-    if not ci_completed:
-        print(f"CI doesn't have completed runs for {sha1}")
-        return False
-
-    return True
