@@ -5,31 +5,26 @@
 
 # Creates a GitHub release
 # example usage
-# ./src/create_release.py --repo KDAlgorithms --version 1.4 --releasenotes 1.4_notes.txt
+# ./src/create_release.py --repo KDAlgorithms --version 1.4 --sha1 1fcdd65fb2dc46b67f238e6fee33ae7973421016
 
 import sys
 import argparse
 import gh_utils
+import changelog_utils
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--repo", help="GitHub repository name", required=True)
 parser.add_argument("--version", help="Release version", required=True)
-parser.add_argument(
-    "--releasenotes", help="Path to release notes file", required=True)
+parser.add_argument("--sha1", help="Sha1 for tagging", required=True)
 
 args = parser.parse_args()
 
-notes = ""
-try:
-    with open(args.releasenotes) as f:
-        notes = f.read()
-except IOError:
-    print(f"Error: Could not read releasenotes file {args.releasenotes}")
+release_notes = changelog_utils.get_changelog(
+    args.repo, args.version, args.sha1)
+
+if not release_notes:
+    print(f"No release found for version {args.version} in {args.sha1}")
     sys.exit(1)
 
-if not notes:
-    print("No notes found in releasenotes file")
-    sys.exit(1)
-
-gh_utils.create_release(args.repo, args.version, notes)
+gh_utils.create_release(args.repo, args.version, release_notes)
