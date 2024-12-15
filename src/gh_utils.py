@@ -10,7 +10,7 @@
 # v2.1.0
 
 import argparse
-from utils import repo_exists, run_command, run_command_with_output, run_command_silent
+from utils import repo_exists, run_command, run_command_with_output, run_command_silent, tagForVersion
 import os
 import tomllib
 
@@ -27,20 +27,26 @@ def get_latest_release_tag_in_github(repo):
     version = lines[0].split('\t')[2]
     return version
 
+
 def tag_exists(repo, tag):
     return run_command_silent(f"gh api repos/KDAB/{repo}/git/refs/tags/{tag}")
+
 
 def download_tarball(repo, tag):
     return run_command_silent(f"curl -L -o {repo}-{tag}.tar.gz https://github.com/KDAB/{repo}/archive/refs/tags/{tag}.tar.gz")
 
+
 def tarball_has_integrity(filename):
-    return run_command_silent(f"tar tzf {filename}");
+    return run_command_silent(f"tar tzf {filename}")
+
 
 def sign_file(filename):
     return run_command(f"gpg --local-user \"KDAB Products\" --armor --detach-sign {filename}")
 
+
 def release_exists(repo, tag):
     return run_command_silent(f"gh release view {tag} --repo KDAB/{repo}")
+
 
 def create_release(repo, tag, notes):
     if not repo_exists(repo):
@@ -80,14 +86,17 @@ def create_release(repo, tag, notes):
 
     return True
 
+
 def ci_run_status(proj_name, sha1):
     print("run: " + f"gh run list --commit {sha1} --json status,name")
-    output = run_command_with_output(f"gh run list -R KDAB/{proj_name} --commit {sha1} --json status,name")
+    output = run_command_with_output(
+        f"gh run list -R KDAB/{proj_name} --commit {sha1} --json status,name")
     in_progress = "in_progress" in output
     completed = "completed" in output
     failed = "failure" in output or "timed_out" in output or "cancelled" in output
 
     return in_progress, completed, failed
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

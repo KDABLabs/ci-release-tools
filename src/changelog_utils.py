@@ -5,6 +5,7 @@
 
 from utils import downloadFileAsString
 
+
 def get_kddockwidgets_changelog(version, sha1):
     filename = f"https://raw.githubusercontent.com/KDAB/KDDockWidgets/{sha1}/Changelog"
     text = downloadFileAsString(filename)
@@ -16,6 +17,8 @@ def get_kddockwidgets_changelog(version, sha1):
     return ""
 
 # Gets the changelog for the specified version
+
+
 def get_changelog(proj_name, version, sha1):
     if proj_name == 'KDDockWidgets':
         return get_kddockwidgets_changelog(version, sha1)

@@ -83,7 +83,9 @@ def is_numeric(version):
     # - Version in CMake doesn't match
     # - Changelog entry doesn't exist
     # - CI has failures
-def can_bump_to(proj_name, version, sha1, check_ci = True):
+
+
+def can_bump_to(proj_name, version, sha1, check_ci=True):
     if not is_numeric(version):
         print("Do not pass versions with prefixes")
         return False
