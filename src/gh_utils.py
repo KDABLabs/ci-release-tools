@@ -10,9 +10,7 @@
 # v2.1.0
 
 import argparse
-from utils import repo_exists, run_command, run_command_with_output, run_command_silent, tagForVersion
-import os
-import tomllib
+from utils import repo_exists, run_command, run_command_with_output, run_command_silent
 
 # Returns the tag of latest release
 # repo is for example 'KDAB/KDReports'

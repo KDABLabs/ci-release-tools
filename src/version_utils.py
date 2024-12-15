@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 from changelog_utils import get_changelog
-from utils import downloadFileAsString, get_project
+from utils import download_file_as_string, get_project
 from gh_utils import tag_exists, ci_run_status
 import re
 
@@ -38,7 +38,7 @@ def previous_version(version):
 
 def get_kddockwidgets_version_in_cmake(sha1):
     filename = f"https://raw.githubusercontent.com/KDAB/KDDockWidgets/{sha1}/CMakeLists.txt"
-    cmake_contents = downloadFileAsString(filename)
+    cmake_contents = download_file_as_string(filename)
 
     major_pattern = r'set\(KDDockWidgets_VERSION_MAJOR\s+(\d+)\)'
     minor_pattern = r'set\(KDDockWidgets_VERSION_MINOR\s+(\d+)\)'

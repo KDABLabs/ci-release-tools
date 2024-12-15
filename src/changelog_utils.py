@@ -3,12 +3,12 @@
 # SPDX-FileCopyrightText: 2024 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
 # SPDX-License-Identifier: MIT
 
-from utils import downloadFileAsString
+from utils import download_file_as_string
 
 
 def get_kddockwidgets_changelog(version, sha1):
     filename = f"https://raw.githubusercontent.com/KDAB/KDDockWidgets/{sha1}/Changelog"
-    text = downloadFileAsString(filename)
+    text = download_file_as_string(filename)
 
     sections = text.split('* v')
     for section in sections:

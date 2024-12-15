@@ -61,7 +61,7 @@ def get_project(name):
 
 
 # Downloads a file and returns it as a string
-def downloadFileAsString(filename):
+def download_file_as_string(filename):
     import urllib.request
     result = ""
     try:
