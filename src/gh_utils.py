@@ -10,7 +10,7 @@
 # v2.1.0
 
 import argparse
-from utils import repo_exists, run_command, run_command_with_output, run_command_silent
+from utils import repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version
 
 # Returns the tag of latest release
 # repo is for example 'KDAB/KDReports'
@@ -28,6 +28,23 @@ def get_latest_release_tag_in_github(repo):
 
 def tag_exists(repo, tag):
     return run_command_silent(f"gh api repos/KDAB/{repo}/git/refs/tags/{tag}")
+
+
+def create_tag(proj_name, version, sha):
+    tag = tag_for_version(proj_name, version)
+    if tag_exists(proj_name, tag):
+        print(f"Tag {tag} already exists!")
+        return False
+
+    cmd = f"git tag -a {tag} {sha} -m \"{proj_name} {tag}\""
+    if not run_command(cmd):
+        print(f"Failed to create tag {tag}")
+        return False
+
+    if not run_command(f"git push origin {tag}"):
+        print(f"Failed to push tag {tag}")
+        return False
+    return True
 
 
 def download_tarball(repo, tag):
