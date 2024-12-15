@@ -63,7 +63,8 @@ def release_exists(repo, tag):
     return run_command_silent(f"gh release view {tag} --repo KDAB/{repo}")
 
 
-def create_release(repo, tag, notes):
+def create_release(repo, version, notes):
+    tag = tag_for_version(repo, version)
     if not repo_exists(repo):
         print(f"error: unknown repo {repo}, check releasing.toml")
         return False
