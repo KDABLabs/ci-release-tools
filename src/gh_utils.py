@@ -47,12 +47,12 @@ def create_tag_via_git(proj_name, version, sha, repo_path):
         print(f"Tag {tag} already exists!")
         return False
 
-    cmd = f"git tag -a {tag} {sha} -m \"{proj_name} {tag}\""
+    cmd = f"git -C {repo_path} tag -a {tag} {sha} -m \"{proj_name} {tag}\""
     if not run_command(cmd):
         print(f"Failed to create tag {tag}")
         return False
 
-    if not run_command(f"git push origin {tag}"):
+    if not run_command(f"git -C {repo_path} push origin {tag}"):
         print(f"Failed to push tag {tag}")
         return False
     return True
@@ -133,7 +133,7 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign, should_cr
             print("error: Project not ready to be tagged.")
             return False
 
-        if not create_tag(repo, version, sha1):
+        if not create_tag_via_git(repo, version, sha1, repo_path):
             print("error: Could not create tag")
             return False
     else:
