@@ -183,6 +183,9 @@ def ci_run_status(proj_name, sha1):
     completed = "completed" in output
     failed = "failure" in output or "timed_out" in output or "cancelled" in output
 
+    if in_progress or completed or failed:
+        print(output)
+
     return in_progress, completed, failed
 
 
