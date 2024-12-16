@@ -179,9 +179,23 @@ def ci_run_status(proj_name, sha1):
     print("run: " + f"gh run list --commit {sha1} --json status,name")
     output = run_command_with_output(
         f"gh run list -R KDAB/{proj_name} --commit {sha1} --json status,name")
-    in_progress = "in_progress" in output
-    completed = "completed" in output
-    failed = "failure" in output or "timed_out" in output or "cancelled" in output
+
+    import json
+    try:
+        output = json.loads(output)
+    except Exception as e:
+        print(f"Failed to parse JSON: {output}")
+        raise e
+
+    filtered_data = [
+        item for item in output if item["name"] != "Create release"]
+
+    in_progress = any(item["status"] ==
+                      "in_progress" for item in filtered_data)
+    completed = any(item["status"] == "completed" for item in filtered_data)
+
+    failure_states = ["failure", "timed_out", "cancelled"]
+    failed = any(item["status"] in failure_states for item in filtered_data)
 
     if in_progress or completed or failed:
         print(output)
