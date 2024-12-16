@@ -36,5 +36,7 @@ if not release_notes:
     print(f"No release found for version {args.version} in {args.sha1}")
     sys.exit(1)
 
-gh_utils.create_release(args.repo, args.version,
-                        args.sha1, release_notes, args.repo_path, args.sign)
+result = gh_utils.create_release(args.repo, args.version,
+                                 args.sha1, release_notes, args.repo_path, args.sign)
+
+sys.exit(0 if result else -1)

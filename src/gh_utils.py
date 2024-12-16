@@ -104,15 +104,15 @@ def can_bump_to(proj_name, version, sha1, check_ci=True):
 
     ci_in_progress, ci_completed, ci_failed = ci_run_status(proj_name, sha1)
     if ci_in_progress:
-        print("CI is still running, please try again later")
+        print("error: CI is still running, please try again later")
         return False
 
     if ci_failed:
-        print(f"CI has failed jobs for sha1 {sha1}")
+        print(f"error: CI has failed jobs for sha1 {sha1}")
         return False
 
     if not ci_completed:
-        print(f"CI doesn't have completed runs for {sha1}")
+        print(f"error: CI doesn't have completed runs for {sha1}")
         return False
 
     return True
