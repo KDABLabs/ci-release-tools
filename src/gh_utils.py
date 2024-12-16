@@ -175,6 +175,25 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign, should_cr
     return True
 
 
+# Since GH actions can't sign, here's a function that signs and uploads
+# To be run locally
+def sign_and_upload(proj_name, version):
+    tag = tag_for_version(proj_name, version)
+    if not download_tarball(proj_name, tag):
+        print(f"error: failed to download tarball for {proj_name}")
+        return False
+    tarball = f"{proj_name}-{tag}.tar.gz"
+    if not sign_file(tarball):
+        print(f"error: Failed to sign {tarball}")
+        return False
+
+    if not run_command(f"gh release upload -R KDAB/{proj_name} {tag} {tarball}.asc"):
+        print("error: Could not create release")
+        return False
+
+    return True
+
+
 def ci_run_status(proj_name, sha1):
     print("run: " + f"gh run list --commit {sha1} --json status,name")
     output = run_command_with_output(
