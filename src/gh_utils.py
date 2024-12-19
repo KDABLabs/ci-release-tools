@@ -9,6 +9,7 @@
 # $ gh_utils.py --get-latest-release=KDAB/KDDockWidgets
 # v2.1.0
 
+import json
 import argparse
 from utils import repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
@@ -149,7 +150,7 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign, should_cr
         print(f"error: failed to download tarball from repo {repo}")
         return False
 
-    tarball = f"{repo}-{tag}.tar.gz"
+    tarball = f"{repo}-{version}.tar.gz".lower()
     if not tarball_has_integrity(tarball):
         print(f"error: Tarball {tarball} is corrupted")
         return False
@@ -182,7 +183,8 @@ def sign_and_upload(proj_name, version):
     if not download_tarball(proj_name, tag):
         print(f"error: failed to download tarball for {proj_name}")
         return False
-    tarball = f"{proj_name}-{tag}.tar.gz"
+
+    tarball = f"{proj_name}-{version}.tar.gz".lower()
     if not sign_file(tarball):
         print(f"error: Failed to sign {tarball}")
         return False
@@ -199,7 +201,6 @@ def ci_run_status(proj_name, sha1):
     output = run_command_with_output(
         f"gh run list -R KDAB/{proj_name} --commit {sha1} --json status,name")
 
-    import json
     try:
         output = json.loads(output)
     except Exception as e:
