@@ -181,7 +181,7 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign):
 # To be run locally
 def sign_and_upload(proj_name, version):
     tag = tag_for_version(proj_name, version)
-    if not download_tarball(proj_name, tag):
+    if not download_tarball(proj_name, tag, version):
         print(f"error: failed to download tarball for {proj_name}")
         return False
 
