@@ -5,7 +5,7 @@
 
 # Creates a GitHub release
 # example usage
-# ./src/create_release.py --repo KDAlgorithms --version 1.4 --sha1 1fcdd65fb2dc46b67f238e6fee33ae7973421016 --repo-path ../KDDockWidgets/ [--sign]
+# ./src/create_release.py --repo KDDockWidgets --version 2.2.1 --sha1 3aaccddc00a11a643e0959a24677838993de15ac --repo-path ../KDDockWidgets/ [--sign]
 
 import sys
 import os
