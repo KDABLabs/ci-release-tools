@@ -65,8 +65,8 @@ def create_tag_via_git(proj_name, version, sha, repo_path):
     return True
 
 
-def download_tarball(repo, tag):
-    return run_command_silent(f"curl -L -o {repo}-{tag}.tar.gz https://github.com/KDAB/{repo}/archive/refs/tags/{tag}.tar.gz")
+def download_tarball(repo, tag, version):
+    return run_command_silent(f"curl -L -o {repo.lower()}-{version}.tar.gz https://github.com/KDAB/{repo}/archive/refs/tags/{tag}.tar.gz")
 
 
 def tarball_has_integrity(filename):
@@ -147,7 +147,7 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign):
         print(f"error: release {tag} already exists in {repo}")
         return False
 
-    if not download_tarball(repo, tag):
+    if not download_tarball(repo, tag, version):
         print(f"error: failed to download tarball from repo {repo}")
         return False
 
