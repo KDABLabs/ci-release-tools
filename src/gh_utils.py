@@ -15,6 +15,7 @@ from utils import repo_exists, run_command, run_command_with_output, run_command
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
 from changelog_utils import get_changelog
 
+
 def get_latest_release_tag_in_github(repo):
     """
     Returns the tag of latest release
@@ -28,8 +29,10 @@ def get_latest_release_tag_in_github(repo):
     version = lines[0].split('\t')[2]
     return version
 
+
 def tag_exists(repo, tag):
     return run_command_silent(f"gh api repos/KDAB/{repo}/git/refs/tags/{tag}")
+
 
 def sha1_for_tag(repo_path, tag):
     """
@@ -39,9 +42,11 @@ def sha1_for_tag(repo_path, tag):
         f"git -C {repo_path} rev-parse {tag}^{{commit}}")
     return output.strip()
 
+
 def create_tag(proj_name, tag, sha1):
     cmd = f"gh api -X POST /repos/KDAB/{proj_name}/git/refs -f ref=refs/tags/{tag} -f sha={sha1}"
     return run_command(cmd)
+
 
 def create_tag_via_git(proj_name, version, sha, repo_path):
     """
@@ -77,6 +82,7 @@ def tarball_has_integrity(filename):
 def sign_file(filename):
     return run_command(f"gpg --local-user \"KDAB Products\" --armor --detach-sign {filename}")
 
+
 def can_bump_to(proj_name, version, sha1, check_ci=True):
     """
     Returns True if we can bump to the specified version
@@ -110,18 +116,20 @@ def can_bump_to(proj_name, version, sha1, check_ci=True):
             f"You need to bump the version in CMakeLists.txt, currently it's at {cur_cmake_version}")
         return False
 
-    ci_in_progress, ci_completed, ci_failed = ci_run_status(proj_name, sha1)
-    if ci_in_progress:
-        print("error: CI is still running, please try again later")
-        return False
+    if check_ci:
+        ci_in_progress, ci_completed, ci_failed = ci_run_status(
+            proj_name, sha1)
+        if ci_in_progress:
+            print("error: CI is still running, please try again later")
+            return False
 
-    if ci_failed:
-        print(f"error: CI has failed jobs for sha1 {sha1}")
-        return False
+        if ci_failed:
+            print(f"error: CI has failed jobs for sha1 {sha1}")
+            return False
 
-    if not ci_completed:
-        print(f"error: CI doesn't have completed runs for {sha1}")
-        return False
+        if not ci_completed:
+            print(f"error: CI doesn't have completed runs for {sha1}")
+            return False
 
     return True
 
@@ -199,6 +207,7 @@ def sign_and_upload(proj_name, version):
         return False
 
     return True
+
 
 def ci_run_status(proj_name, sha1):
     output = run_command_with_output(
