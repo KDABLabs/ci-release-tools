@@ -35,6 +35,10 @@ def tag_exists(repo, tag):
 # uses gh to create a tag
 
 
+def sha1_for_tag(repo_path, tag):
+    output = run_command_with_output(f"git -C {repo_path} rev-parse {tag}^{{commit}}")
+    return output.strip()
+
 def create_tag(proj_name, tag, sha1):
     cmd = f"gh api -X POST /repos/KDAB/{proj_name}/git/refs -f ref=refs/tags/{tag} -f sha={sha1}"
     return run_command(cmd)
@@ -45,13 +49,15 @@ def create_tag(proj_name, tag, sha1):
 def create_tag_via_git(proj_name, version, sha, repo_path):
     tag = tag_for_version(proj_name, version)
     if tag_exists(proj_name, tag):
-        print(f"Tag {tag} already exists!")
-        return False
-
-    cmd = f"git -C {repo_path} tag -a {tag} {sha} -m \"{proj_name} {tag}\""
-    if not run_command(cmd):
-        print(f"Failed to create tag {tag}")
-        return False
+        existing_tagged_sha1 = sha1_for_tag(repo_path, tag)
+        if sha != existing_tagged_sha1:
+            print(f"Tag {tag} already exists but points to different sha {sha} != {existing_tagged_sha1}!")
+            return False
+    else:
+        cmd = f"git -C {repo_path} tag -a {tag} {sha} -m \"{proj_name} {tag}\""
+        if not run_command(cmd):
+            print(f"Failed to create tag {tag}")
+            return False
 
     if not run_command(f"git -C {repo_path} push origin {tag}"):
         print(f"Failed to push tag {tag}")
@@ -123,24 +129,19 @@ def release_exists(repo, tag):
     return run_command_silent(f"gh release view {tag} --repo KDAB/{repo}")
 
 
-def create_release(repo, version, sha1, notes, repo_path, should_sign, should_create_tag=True):
+def create_release(repo, version, sha1, notes, repo_path, should_sign):
     tag = tag_for_version(repo, version)
     if not repo_exists(repo):
         print(f"error: unknown repo {repo}, check releasing.toml")
         return False
 
-    if should_create_tag:
-        if not can_bump_to(repo, version, sha1):
-            print("error: Project not ready to be tagged.")
-            return False
+    if not can_bump_to(repo, version, sha1):
+        print("error: Project not ready to be tagged.")
+        return False
 
-        if not create_tag_via_git(repo, version, sha1, repo_path):
-            print("error: Could not create tag")
-            return False
-    else:
-        if not tag_exists(repo, tag):
-            print(f"error: tag {tag} doesn't exist in repo {repo}")
-            return False
+    if not create_tag_via_git(repo, version, sha1, repo_path):
+        print("error: Could not create tag")
+        return False
 
     if release_exists(repo, tag):
         print(f"error: release {tag} already exists in {repo}")
