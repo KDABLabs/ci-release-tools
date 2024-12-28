@@ -9,16 +9,19 @@ import os
 import sys
 import tomllib
 import subprocess
+import tempfile
+import urllib.request
 
 
 def exit_because(reason):
     print(reason)
     sys.exit(1)
 
-# runs a command but doesn't print to stdout/stderr
-
 
 def run_command_silent(command):
+    '''
+    runs a command but doesn't print to stdout/stderr
+    '''
     result = subprocess.run(
         command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return result.returncode == 0
@@ -50,19 +53,22 @@ def get_projects():
         return toml_content['project']
     return None
 
-# example: get_project('KDReports')
-
 
 def get_project(name):
+    '''
+    Reads releasing.toml and returns the specified project
+    example: get_project('KDReports')
+    '''
     projects = get_projects()
     if name not in projects:
         exit_because(f"Project {name} does not exist")
     return projects[name]
 
 
-# Downloads a file and returns it as a string
 def download_file_as_string(filename):
-    import urllib.request
+    '''
+    Downloads a file and returns it as a string
+    '''
     result = ""
     try:
         with urllib.request.urlopen(filename) as response:
@@ -76,3 +82,19 @@ def download_file_as_string(filename):
 def tag_for_version(proj_name, version):
     proj = get_project(proj_name)
     return f"{proj['tag_prefix']}{version}"
+
+
+def create_tarball_with_submodules(proj_name, sha1, version):
+    '''
+    Create a release tarball including submodules.
+    Some of our projects depend on unpopular submodules which aren't packaged anywhere.
+    '''
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        clone_dir = f"{temp_dir}/{proj_name.lower()}-{version}"
+        run_command(
+            f"git clone https://github.com/KDAB/{proj_name} {clone_dir}")
+        run_command(f"git -C {clone_dir} checkout {sha1}")
+        run_command(f"git -C {clone_dir} submodule update --init --recursive")
+        run_command(
+            f"tar --exclude='.git' -C {temp_dir} -czvf {proj_name.lower()}-{version}.tar.gz {proj_name.lower()}-{version}")
