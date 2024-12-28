@@ -18,15 +18,19 @@
 # - homebrew
 #   Points to the homebrew formula. consumed by our KDAB/homebrew-tap scripts
 # - tag_prefix
-#   If empty, 'v' is used
-#   Some projects have tags prefixed with their name, for example tag 'kdsoap-x.y.z'
-#   we can't normalized this now, as it would break package urls.
+#   Some projects have tags prefixed with their name, for example tag 'kdsoap-x.y.z', others prefixed
+#   with 'v'. We can't normalized this now, as it would break package urls.
+# - tarball_includes_submodules
+#   Default false.
+#   Whether the release tarball includes the submodules. This is the case for submodules which are
+#   unpopular and not packaged elsewhere.
 
 [project]
 
 [project.KDSoap]
 signed_release = true
 has_submodules = true
+tarball_includes_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
 tag_prefix = "kdsoap-"
