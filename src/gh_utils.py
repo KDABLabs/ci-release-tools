@@ -264,7 +264,7 @@ def get_submodule_dependency_version(repo_path):
         which returns: 11.0.0-546-gb4650ee85
     This won't update/init submodules, be sure to not run on an old checkout.
     '''
-    return run_command_with_output(f"git -C {repo_path} describe --tags HEAD").strip()
+    return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags HEAD").strip()
 
 
 def print_submodule_versions(repo_paths):
