@@ -240,18 +240,25 @@ def get_submodule_dependency_version(dep, repo_path):
     Runs git-describe on a sub-module, for example:
         git -C ../KDStateMachineEditor/3rdparty/graphviz describe --tags HEAD
         which returns: 11.0.0-546-gb4650ee85
+    This won't update/init submodules, be sure to not run on an old checkout.
     '''
     return run_command_with_output(f"git -C {repo_path}/{dep['submodule']} describe --tags HEAD").strip()
 
 
 def print_submodule_versions(repo_paths):
+    '''
+    prints the versions of submodules used by all KD* projects
+    This won't update/init submodules, be sure to not run on an old checkout.
+    '''
     projs = get_projects()
     for proj in projs:
         deps = get_submodule_builtin_dependencies(proj)
+        if deps.items():
+            print(f"{proj}:")
         for key, dep in deps.items():
             try:
                 print(
-                    f"{proj} -> {key}: {get_submodule_dependency_version(dep, repo_paths + '/' + proj)}")
+                    f"    {key}: {get_submodule_dependency_version(dep, repo_paths + '/' + proj)}")
             except:
                 pass
 
