@@ -37,6 +37,11 @@ tag_prefix = "kdsoap-"
 homebrew = ["kdsoap-qt5.rb", "kdsoap-qt6.rb"]
 main_branch = "master"
 
+[project.KDSoap.dependencies]
+[project.KDSoap.dependencies.libkode]
+# libkode has no tags
+# submodule = "kdwsdl2cpp/libkode"
+
 [project.KDReports]
 signed_release = true
 has_submodules = false
@@ -126,3 +131,39 @@ has_fetchcontent = true
 automated_3rdparty_updates = false
 homebrew = ["kdutils.rb"]
 main_branch = "main"
+
+[project.Knut]
+tag_prefix = "v"
+signed_release = true
+has_submodules = true
+has_fetchcontent = false
+automated_3rdparty_updates = false
+main_branch = "main"
+
+[project.Knut.dependencies]
+[project.Knut.dependencies.extra_cmake_modules]
+submodule = "3rdparty/extra-cmake-modules"
+
+[project.Knut.dependencies.kdalgorithms]
+submodule = "3rdparty/kdalgorithms"
+
+[project.Knut.dependencies.ksyntaxhighlighting]
+submodule = "3rdparty/ksyntaxhighlighting"
+
+[project.Knut.dependencies.nlohmann_json]
+submodule = "3rdparty/nlohmann-json"
+
+[project.Knut.dependencies.pugixml]
+submodule = "3rdparty/pugixml"
+
+[project.Knut.dependencies.spdlog]
+submodule = "3rdparty/spdlog"
+
+[project.Knut.dependencies.tree_sitter]
+submodule = "3rdparty/tree-sitter"
+
+[project.Knut.dependencies.tree_sitter_cpp]
+submodule = "3rdparty/tree-sitter-cpp"
+
+[project.Knut.dependencies.tree_sitter_qmljs]
+submodule = "3rdparty/tree-sitter-qmljs"
