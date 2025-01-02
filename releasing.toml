@@ -71,8 +71,9 @@ homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
 [project.KDStateMachineEditor.dependencies]
 [project.KDStateMachineEditor.dependencies.graphviz]
-submodule = "3rdparty/graphviz"
+has_github_release = false # it's in gitlab
 
+submodule = "3rdparty/graphviz"
 [project.KDSingleApplication]
 tag_prefix = "v"
 signed_release = true
@@ -143,12 +144,16 @@ main_branch = "main"
 [project.Knut.dependencies]
 [project.Knut.dependencies.extra_cmake_modules]
 submodule = "3rdparty/extra-cmake-modules"
+has_github_release = false
+main_branch = 'master'
 
 [project.Knut.dependencies.kdalgorithms]
 submodule = "3rdparty/kdalgorithms"
 
 [project.Knut.dependencies.ksyntaxhighlighting]
 submodule = "3rdparty/ksyntaxhighlighting"
+has_github_release = false
+main_branch = 'master'
 
 [project.Knut.dependencies.nlohmann_json]
 submodule = "3rdparty/nlohmann-json"
@@ -167,3 +172,5 @@ submodule = "3rdparty/tree-sitter-cpp"
 
 [project.Knut.dependencies.tree_sitter_qmljs]
 submodule = "3rdparty/tree-sitter-qmljs"
+has_github_release = false
+main_branch = 'master'

@@ -16,17 +16,23 @@ from version_utils import is_numeric, previous_version, get_current_version_in_c
 from changelog_utils import get_changelog
 
 
-def get_latest_release_tag_in_github(repo, cwd=None):
+def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag = False):
     """
     Returns the tag of latest release
     repo is for example 'KDAB/KDReports'. If None, then gh will be run inside the repo at cwd.
+    If via_tag is true, we'll try git locally, instead of gh release, which doesn't require local repo.
     """
 
+    if via_tag:
+        cmd = f"git -C {repo_path} describe --tags --abbrev=0 {main_branch}"
+        return run_command_with_output(cmd).strip()
+
+    # Via gh release:
     try:
         repo_arg = f"--repo {repo}" if repo else ""
 
         cmd = f"gh release list {repo_arg} --limit 1"
-        lines = run_command_with_output(cmd, cwd).split('\n')
+        lines = run_command_with_output(cmd, repo_path).split('\n')
         if not lines or lines == ['']:
             return None
 
@@ -274,10 +280,14 @@ def print_submodule_versions(repo_paths):
         for key, dep in deps.items():
             try:
                 repo_path = repo_paths + '/' + proj + '/' + dep['submodule']
+
+                has_github_release = dep.get('has_github_release', True)
+                submodule_main_branch = dep.get('main_branch', 'main')
+
                 latest_version = get_latest_release_tag_in_github(
-                    None, repo_path)
+                    None, repo_path, submodule_main_branch, not has_github_release)
                 current_version = get_submodule_dependency_version(repo_path)
-                if latest_version == current_version:
+                if latest_version == current_version or current_version == 'latest':
                     print(
                         f"    {key}: {current_version}")
                 elif latest_version:
@@ -296,6 +306,6 @@ if __name__ == "__main__":
                         help="returns latest release for a repo")
     args = parser.parse_args()
     if args.get_latest_release:
-        print(get_latest_release_tag_in_github(args.get_latest_release))
+        print(get_latest_release_tag_in_github(args.get_latest_release, None, None))
 
 # print_submodule_versions('..')
