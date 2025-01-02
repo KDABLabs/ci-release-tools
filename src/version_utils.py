@@ -6,14 +6,17 @@
 import re
 from utils import download_file_as_string
 
-# example:
-# 2.1.1 -> 2.1.0
-# 2.1.0 -> 2.0.0
-# 2.0.0 -> 1.0.0
-# Just to make sure we're not skipping versions when bumping
-
 
 def previous_version(version):
+    '''
+    Returns the previous version, example:
+    2.1.1 -> 2.1.0
+    2.1.0 -> 2.0.0
+    2.0.0 -> 1.0.0
+
+    Just to make sure we're not skipping versions when bumping.
+    '''
+
     ver_split = version.split('.')
     ver_major = int(ver_split[0])
     ver_minor = int(ver_split[1])
