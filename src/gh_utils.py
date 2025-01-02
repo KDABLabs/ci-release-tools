@@ -11,7 +11,7 @@
 
 import json
 import argparse
-from utils import repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project
+from utils import get_projects, repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project, get_submodule_builtin_dependencies
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
 from changelog_utils import get_changelog
 
@@ -235,6 +235,27 @@ def ci_run_status(proj_name, sha1):
     return in_progress, completed, failed
 
 
+def get_submodule_dependency_version(dep, repo_path):
+    '''
+    Runs git-describe on a sub-module, for example:
+        git -C ../KDStateMachineEditor/3rdparty/graphviz describe --tags HEAD
+        which returns: 11.0.0-546-gb4650ee85
+    '''
+    return run_command_with_output(f"git -C {repo_path}/{dep['submodule']} describe --tags HEAD").strip()
+
+
+def print_submodule_versions(repo_paths):
+    projs = get_projects()
+    for proj in projs:
+        deps = get_submodule_builtin_dependencies(proj)
+        for key, dep in deps.items():
+            try:
+                print(
+                    f"{proj} -> {key}: {get_submodule_dependency_version(dep, repo_paths + '/' + proj)}")
+            except:
+                pass
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--get-latest-release', metavar='REPO',
@@ -242,3 +263,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.get_latest_release:
         print(get_latest_release_tag_in_github(args.get_latest_release))
+
+# print_submodule_versions('..')

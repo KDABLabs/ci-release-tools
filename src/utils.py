@@ -65,6 +65,28 @@ def get_project(name):
     return projects[name]
 
 
+def get_builtin_dependencies(name):
+    '''
+    Returns the dependencies portion of releasing.toml
+    For example, for 'KDStateMachineEditor it can return:
+        {'graphviz': {'submodule': '3rdparty/graphviz'} }
+    '''
+    proj = get_project(name)
+    try:
+        return proj['dependencies']
+    except KeyError:
+        return {}
+
+
+def get_submodule_builtin_dependencies(name):
+    '''
+    Like get_builtin_dependencies() but only honours submodules, not fetchcontent
+    '''
+
+    deps = get_builtin_dependencies(name)
+    return {k: v for k, v in deps.items() if 'submodule' in v}
+
+
 def download_file_as_string(filename):
     '''
     Downloads a file and returns it as a string

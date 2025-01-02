@@ -64,6 +64,10 @@ automated_3rdparty_updates = false
 main_branch = "master"
 homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
+[project.KDStateMachineEditor.dependencies]
+[project.KDStateMachineEditor.dependencies.graphviz]
+submodule = "3rdparty/graphviz"
+
 [project.KDSingleApplication]
 tag_prefix = "v"
 signed_release = true
@@ -73,7 +77,7 @@ automated_3rdparty_updates = false
 homebrew = ["kdsingleapplication-qt5.rb", "kdsingleapplication-qt6.rb"]
 main_branch = "master"
 
-[project.Gammaray]
+[project.GammaRay]
 tag_prefix = "v"
 signed_release = true
 has_submodules = true
@@ -81,6 +85,11 @@ has_fetchcontent = false
 automated_3rdparty_updates = false
 homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
 main_branch = "master"
+
+[project.GammaRay.dependencies]
+[project.GammaRay.dependencies.KDStateMachineEditor]
+submodule = "3rdparty/KDStateMachineEditor"
+
 
 [project.KDChart]
 tag_prefix = "v"
