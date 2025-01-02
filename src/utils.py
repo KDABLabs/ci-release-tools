@@ -37,8 +37,15 @@ def run_command(command, fatal=True):
     return False
 
 
-def run_command_with_output(command):
-    output = os.popen(command).read()
+def run_command_with_output(command, cwd=None):
+    current_dir = os.getcwd()
+    if cwd:
+        os.chdir(cwd)
+    try:
+        output = os.popen(command).read()
+    finally:
+        if cwd:
+            os.chdir(current_dir)
     return output
 
 

@@ -16,17 +16,33 @@ from version_utils import is_numeric, previous_version, get_current_version_in_c
 from changelog_utils import get_changelog
 
 
-def get_latest_release_tag_in_github(repo):
+def get_latest_release_tag_in_github(repo, cwd=None):
     """
     Returns the tag of latest release
-    repo is for example 'KDAB/KDReports'
+    repo is for example 'KDAB/KDReports'. If None, then gh will be run inside the repo at cwd.
     """
-    lines = run_command_with_output(
-        f"gh release list --repo {repo} --limit 1").split('\n')
-    # example:
-    # TITLE            TYPE    TAG NAME         PUBLISHED
-    # KDReports 2.3.0  Latest  kdreports-2.3.0  about 2 months ago
-    version = lines[0].split('\t')[2]
+
+    try:
+        repo_arg = f"--repo {repo}" if repo else ""
+
+        cmd = f"gh release list {repo_arg} --limit 1"
+        lines = run_command_with_output(cmd, cwd).split('\n')
+        if not lines or lines == ['']:
+            return None
+
+        # print(f"lines={lines}, cmd={cmd}, cwd={cwd}")
+
+        # example:
+        # TITLE            TYPE    TAG NAME         PUBLISHED
+        # KDReports 2.3.0  Latest  kdreports-2.3.0  about 2 months ago
+        version = lines[0].split('\t')
+        if len(version) < 3:
+            print(f"get_latest_release_tag_in_github: could not parse {lines}")
+            return None
+        version = version[2]
+    except Exception as e:
+        print(f"Failed to get latest release: {e}")
+        return None
     return version
 
 
@@ -235,14 +251,14 @@ def ci_run_status(proj_name, sha1):
     return in_progress, completed, failed
 
 
-def get_submodule_dependency_version(dep, repo_path):
+def get_submodule_dependency_version(repo_path):
     '''
     Runs git-describe on a sub-module, for example:
         git -C ../KDStateMachineEditor/3rdparty/graphviz describe --tags HEAD
         which returns: 11.0.0-546-gb4650ee85
     This won't update/init submodules, be sure to not run on an old checkout.
     '''
-    return run_command_with_output(f"git -C {repo_path}/{dep['submodule']} describe --tags HEAD").strip()
+    return run_command_with_output(f"git -C {repo_path} describe --tags HEAD").strip()
 
 
 def print_submodule_versions(repo_paths):
@@ -257,10 +273,21 @@ def print_submodule_versions(repo_paths):
             print(f"{proj}:")
         for key, dep in deps.items():
             try:
-                print(
-                    f"    {key}: {get_submodule_dependency_version(dep, repo_paths + '/' + proj)}")
-            except:
-                pass
+                repo_path = repo_paths + '/' + proj + '/' + dep['submodule']
+                latest_version = get_latest_release_tag_in_github(
+                    None, repo_path)
+                current_version = get_submodule_dependency_version(repo_path)
+                if latest_version == current_version:
+                    print(
+                        f"    {key}: {current_version}")
+                elif latest_version:
+                    print(
+                        f"    {key}: {current_version} ({latest_version} is available)")
+                else:
+                    print(
+                        f"    {key}: {current_version} -> ????")
+            except Exception as e:
+                print(f"Exception: {e}")
 
 
 if __name__ == "__main__":
