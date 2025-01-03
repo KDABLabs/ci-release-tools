@@ -21,6 +21,10 @@ args = parser.parse_args()
 
 versions = gh_utils.get_submodule_versions(args.repo_path, args.proj_name)
 
+
+if versions:
+    print("::group::Versions")
+
 # Print with annotation tags so it appears under GH actions results
 for version in versions:
     latest_version = version['latest_version']
@@ -34,3 +38,6 @@ for version in versions:
             f"::warning::{submodule_name} {current_version} can be bumped to {latest_version}")
     else:
         print(f"::error::Can't determine version of {submodule_name}")
+
+if versions:
+    print("::endgroup::")
