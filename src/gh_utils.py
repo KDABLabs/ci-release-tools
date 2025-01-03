@@ -267,6 +267,39 @@ def get_submodule_dependency_version(repo_path):
     return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags HEAD").strip()
 
 
+def get_submodule_versions(master_repo_path, proj_name):
+    '''
+        returns the list of submodule current and latest versions for give project
+        example:
+            get_submodule_versions('../KDStateMachineEditor', 'KDStateMachineEditor')
+            returns: [
+                {
+                    'name': 'graphviz',
+                    'current_version': '11.0.0',
+                    'latest_version': '12.2.1'
+                }
+            ]
+    '''
+    deps = get_submodule_builtin_dependencies(proj_name)
+    if not deps.items():
+        return []
+
+    result = []
+    for key, dep in deps.items():
+        repo_path = master_repo_path + '/' + dep['submodule']
+        has_github_release = dep.get('has_github_release', True)
+        submodule_main_branch = dep.get('main_branch', 'main')
+        latest_version = get_latest_release_tag_in_github(
+            None, repo_path, submodule_main_branch, not has_github_release)
+        current_version = get_submodule_dependency_version(repo_path)
+
+        result.append({
+            'submodule_name': dep['submodule'],
+            'current_version': current_version,
+            'latest_version': latest_version
+        })
+    return result
+
 def print_submodule_versions(repo_paths):
     '''
     prints the versions of submodules used by all KD* projects
@@ -274,30 +307,21 @@ def print_submodule_versions(repo_paths):
     '''
     projs = get_projects()
     for proj in projs:
-        deps = get_submodule_builtin_dependencies(proj)
-        if deps.items():
-            print(f"{proj}:")
-        for key, dep in deps.items():
-            try:
-                repo_path = repo_paths + '/' + proj + '/' + dep['submodule']
+        versions = get_submodule_versions(repo_paths + '/' + proj, proj)
+        for version in versions:
+            latest_version = version['latest_version']
+            current_version = version['current_version']
+            submodule_name = version['submodule_name']
 
-                has_github_release = dep.get('has_github_release', True)
-                submodule_main_branch = dep.get('main_branch', 'main')
-
-                latest_version = get_latest_release_tag_in_github(
-                    None, repo_path, submodule_main_branch, not has_github_release)
-                current_version = get_submodule_dependency_version(repo_path)
-                if latest_version == current_version or current_version == 'latest':
-                    print(
-                        f"    {key}: {current_version}")
-                elif latest_version:
-                    print(
-                        f"    {key}: {current_version} ({latest_version} is available)")
-                else:
-                    print(
-                        f"    {key}: {current_version} -> ????")
-            except Exception as e:
-                print(f"Exception: {e}")
+            if latest_version == current_version or current_version == 'latest':
+                print(
+                    f"    {submodule_name}: {current_version}")
+            elif latest_version:
+                print(
+                    f"    {submodule_name}: {current_version} ({latest_version} is available)")
+            else:
+                print(
+                    f"    {submodule_name}: {current_version} -> ????")
 
 
 if __name__ == "__main__":
