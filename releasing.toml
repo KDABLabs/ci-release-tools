@@ -174,3 +174,21 @@ submodule = "3rdparty/tree-sitter-cpp"
 submodule = "3rdparty/tree-sitter-qmljs"
 has_github_release = false
 main_branch = 'master'
+
+[project.hotspot]
+tag_prefix = "v"
+has_submodules = true
+has_fetchcontent = false
+automated_3rdparty_updates = false
+main_branch = "master"
+
+# we probably don't want to manage hotspot dependencies automatically
+# [project.hotspot.dependencies.PrefixTickLabels]
+# # submodule = "3rdparty/PrefixTickLabels" no releases
+# has_github_release = false
+# main_branch = 'master'
+
+# [project.hotspot.dependencies.perfparser]
+# submodule = "3rdparty/perfparser"
+# has_github_release = false
+# main_branch = 'hotspot'
