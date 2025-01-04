@@ -16,7 +16,7 @@ from version_utils import is_numeric, previous_version, get_current_version_in_c
 from changelog_utils import get_changelog
 
 
-def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag = False):
+def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag=False):
     """
     Returns the tag of latest release
     repo is for example 'KDAB/KDReports'. If None, then gh will be run inside the repo at cwd.
@@ -285,12 +285,11 @@ def get_submodule_versions(master_repo_path, proj_name):
         return []
 
     result = []
-    for key, dep in deps.items():
+    for dep in deps.values():
         repo_path = master_repo_path + '/' + dep['submodule']
-        has_github_release = dep.get('has_github_release', True)
         submodule_main_branch = dep.get('main_branch', 'main')
         latest_version = get_latest_release_tag_in_github(
-            None, repo_path, submodule_main_branch, not has_github_release)
+            None, repo_path, submodule_main_branch, True)
         current_version = get_submodule_dependency_version(repo_path)
 
         result.append({
@@ -299,6 +298,7 @@ def get_submodule_versions(master_repo_path, proj_name):
             'latest_version': latest_version
         })
     return result
+
 
 def print_submodule_versions(repo_paths):
     '''
@@ -330,6 +330,7 @@ if __name__ == "__main__":
                         help="returns latest release for a repo")
     args = parser.parse_args()
     if args.get_latest_release:
-        print(get_latest_release_tag_in_github(args.get_latest_release, None, None))
+        print(get_latest_release_tag_in_github(
+            args.get_latest_release, None, None))
 
 # print_submodule_versions('..')
