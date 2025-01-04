@@ -7,14 +7,6 @@
 # - signed_release
 #   Says if we currently upload a signed asset to GH releases. Some of our projects
 #   still don't, but will.
-# - automated_3rdparty_updates
-#   Says if we've automated github actions to update 3rdparty and create PR. Eventually
-#   we'd like all repos with 3rdparty to have this.
-# - has_submodules
-#   Repos with submodules need to have their submodules in the release tarball, and should
-#   be subject to automated submodule bump.
-# - has_fetchcontent
-#   Same purpose as 'has_submodules'
 # - homebrew
 #   Points to the homebrew formula. consumed by our KDAB/homebrew-tap scripts
 # - tag_prefix
@@ -29,10 +21,7 @@
 
 [project.KDSoap]
 signed_release = true
-has_submodules = true
 tarball_includes_submodules = true
-has_fetchcontent = false
-automated_3rdparty_updates = false
 tag_prefix = "kdsoap-"
 homebrew = ["kdsoap-qt5.rb", "kdsoap-qt6.rb"]
 main_branch = "master"
@@ -44,9 +33,6 @@ main_branch = "master"
 
 [project.KDReports]
 signed_release = true
-has_submodules = false
-has_fetchcontent = false
-automated_3rdparty_updates = false
 tag_prefix = "kdreports-"
 homebrew = ["kdreports-qt5.rb", "kdreports-qt6.rb"]
 main_branch = "master"
@@ -54,9 +40,6 @@ main_branch = "master"
 [project.KDDockWidgets]
 tag_prefix = "v"
 signed_release = true
-has_submodules = false
-has_fetchcontent = false
-automated_3rdparty_updates = true
 homebrew = ["kddockwidgets-qt5.rb", "kddockwidgets-qt6.rb"]
 main_branch = "main"
 has_version_txt = true
@@ -64,9 +47,6 @@ has_version_txt = true
 [project.KDStateMachineEditor]
 tag_prefix = "v"
 signed_release = true
-has_submodules = true
-has_fetchcontent = false
-automated_3rdparty_updates = false
 main_branch = "master"
 homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
@@ -78,18 +58,12 @@ submodule = "3rdparty/graphviz"
 [project.KDSingleApplication]
 tag_prefix = "v"
 signed_release = true
-has_submodules = false
-has_fetchcontent = false
-automated_3rdparty_updates = false
 homebrew = ["kdsingleapplication-qt5.rb", "kdsingleapplication-qt6.rb"]
 main_branch = "master"
 
 [project.GammaRay]
 tag_prefix = "v"
 signed_release = true
-has_submodules = true
-has_fetchcontent = false
-automated_3rdparty_updates = false
 homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
 main_branch = "master"
 
@@ -101,36 +75,24 @@ submodule = "3rdparty/KDStateMachineEditor"
 [project.KDChart]
 tag_prefix = "v"
 signed_release = true
-has_submodules = false
-has_fetchcontent = false
-automated_3rdparty_updates = false
 homebrew = ["kdchart-qt5.rb", "kdchart-qt6.rb"]
 main_branch = "master"
 
 [project.KDBindings]
 tag_prefix = "v"
 signed_release = false
-has_submodules = false
-has_fetchcontent = false
-automated_3rdparty_updates = false
 homebrew = ["kdbindings.rb"]
 main_branch = "main"
 
 [project.KDAlgorithms]
 tag_prefix = ""
 signed_release = false
-has_submodules = false
-has_fetchcontent = false
-automated_3rdparty_updates = false
 homebrew = ["kdalgorithms.rb"]
 main_branch = "main"
 
 [project.KDUtils]
 tag_prefix = "v"
 signed_release = false
-has_submodules = false
-has_fetchcontent = true
-automated_3rdparty_updates = false
 homebrew = ["kdutils.rb"]
 main_branch = "main"
 
@@ -139,9 +101,6 @@ has_version_txt = true
 
 tag_prefix = "v"
 signed_release = true
-has_submodules = true
-has_fetchcontent = false
-automated_3rdparty_updates = false
 main_branch = "main"
 [project.Knut.dependencies]
 [project.Knut.dependencies.extra_cmake_modules]
@@ -179,9 +138,6 @@ main_branch = 'master'
 
 [project.hotspot]
 tag_prefix = "v"
-has_submodules = true
-has_fetchcontent = false
-automated_3rdparty_updates = false
 main_branch = "master"
 
 # we probably don't want to manage hotspot dependencies automatically
