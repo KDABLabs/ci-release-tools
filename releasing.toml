@@ -59,6 +59,7 @@ has_fetchcontent = false
 automated_3rdparty_updates = true
 homebrew = ["kddockwidgets-qt5.rb", "kddockwidgets-qt6.rb"]
 main_branch = "main"
+has_version_txt = true
 
 [project.KDStateMachineEditor]
 tag_prefix = "v"
@@ -134,13 +135,14 @@ homebrew = ["kdutils.rb"]
 main_branch = "main"
 
 [project.Knut]
+has_version_txt = true
+
 tag_prefix = "v"
 signed_release = true
 has_submodules = true
 has_fetchcontent = false
 automated_3rdparty_updates = false
 main_branch = "main"
-
 [project.Knut.dependencies]
 [project.Knut.dependencies.extra_cmake_modules]
 submodule = "3rdparty/extra-cmake-modules"

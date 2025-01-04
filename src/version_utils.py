@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
-from utils import download_file_as_string
+from utils import download_file_as_string, get_project
 
 
 def previous_version(version):
@@ -37,35 +37,23 @@ def previous_version(version):
     return f"{ver_major}.{ver_minor}.{ver_patch}"
 
 
-def get_kddockwidgets_version_in_cmake(sha1):
-    filename = f"https://raw.githubusercontent.com/KDAB/KDDockWidgets/{sha1}/CMakeLists.txt"
-    cmake_contents = download_file_as_string(filename)
-
-    major_pattern = r'set\(KDDockWidgets_VERSION_MAJOR\s+(\d+)\)'
-    minor_pattern = r'set\(KDDockWidgets_VERSION_MINOR\s+(\d+)\)'
-    patch_pattern = r'set\(KDDockWidgets_VERSION_PATCH\s+(\d+)\)'
-
-    major_match = re.search(major_pattern, cmake_contents)
-    minor_match = re.search(minor_pattern, cmake_contents)
-    patch_match = re.search(patch_pattern, cmake_contents)
-
-    if not (major_match and minor_match and patch_match):
-        return None
-
-    major = major_match.group(1)
-    minor = minor_match.group(1)
-    patch = patch_match.group(1)
-
-    return f"{major}.{minor}.{patch}"
+def get_version_in_versiontxt(project_name, sha1):
+    '''
+    KD* projects compatible with release-plz have a version.txt which is read by CMakeLists.txt
+    All projects are encouraged to port to this way as it's easier for tooling.
+    '''
+    filename = f"https://raw.githubusercontent.com/KDAB/{project_name}/{sha1}/version.txt"
+    file_contents = download_file_as_string(filename)
+    return file_contents.strip()
 
 
 def get_current_version_in_cmake(proj_name, sha1):
-    # proj = get_project(proj_name)
-    if proj_name == 'KDDockWidgets':
-        return get_kddockwidgets_version_in_cmake(sha1)
+    proj = get_project(proj_name)
+    if not proj.get('has_version_txt', False):
+        raise Exception(
+            f"{proj_name} is missing a version.txt which should be read by CMake. Copy from Knut or KDDockWidgets please.")
 
-    raise Exception(
-        f"Don't know how to get version for project {proj_name}. IMPLEMENT ME")
+    return get_version_in_versiontxt(proj_name, sha1)
 
 
 def is_numeric(version):
