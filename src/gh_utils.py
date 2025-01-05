@@ -24,7 +24,7 @@ def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag=False
     """
 
     if via_tag:
-        cmd = f"git -C {repo_path} describe --tags --abbrev=0 {main_branch}"
+        cmd = f"git -C {repo_path} describe --tags --abbrev=0 origin/{main_branch}"
         return run_command_with_output(cmd).strip()
 
     # Via gh release:
