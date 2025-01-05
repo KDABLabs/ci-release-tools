@@ -267,7 +267,7 @@ def get_submodule_dependency_version(repo_path):
     return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags HEAD").strip()
 
 
-def get_submodule_versions(master_repo_path, proj_name):
+def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):
     '''
         returns the list of submodule current and latest versions for give project
         example:
@@ -279,21 +279,25 @@ def get_submodule_versions(master_repo_path, proj_name):
                     'latest_version': '12.2.1'
                 }
             ]
+        If submodule_name is set, returns only versions for that particular submodule
     '''
     deps = get_submodule_builtin_dependencies(proj_name)
     if not deps.items():
         return []
 
     result = []
-    for dep in deps.values():
-        repo_path = master_repo_path + '/' + dep['submodule']
+    for key, dep in deps.items():
+        if key == submodule_name:
+            continue
+
+        repo_path = master_repo_path + '/' + dep['submodule_path']
         submodule_main_branch = dep.get('main_branch', 'main')
         latest_version = get_latest_release_tag_in_github(
             None, repo_path, submodule_main_branch, True)
         current_version = get_submodule_dependency_version(repo_path)
 
         result.append({
-            'submodule_name': dep['submodule'],
+            'submodule_name': dep['submodule_path'],
             'current_version': current_version,
             'latest_version': latest_version
         })

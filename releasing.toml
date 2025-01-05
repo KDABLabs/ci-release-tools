@@ -103,38 +103,38 @@ signed_release = true
 main_branch = "main"
 [project.Knut.dependencies]
 [project.Knut.dependencies.extra_cmake_modules]
-submodule = "3rdparty/extra-cmake-modules"
+submodule_path = "3rdparty/extra-cmake-modules"
 main_branch = 'master'
 
 [project.Knut.dependencies.kdalgorithms]
-submodule = "3rdparty/kdalgorithms"
+submodule_path = "3rdparty/kdalgorithms"
 
 [project.Knut.dependencies.ksyntaxhighlighting]
-submodule = "3rdparty/ksyntaxhighlighting"
+submodule_path = "3rdparty/ksyntaxhighlighting"
 main_branch = 'master'
 
 [project.Knut.dependencies.nlohmann_json]
-submodule = "3rdparty/nlohmann-json"
+submodule_path = "3rdparty/nlohmann-json"
 main_branch = 'master'
 
 [project.Knut.dependencies.pugixml]
-submodule = "3rdparty/pugixml"
+submodule_path = "3rdparty/pugixml"
 main_branch = 'master'
 
 [project.Knut.dependencies.spdlog]
-submodule = "3rdparty/spdlog"
+submodule_path = "3rdparty/spdlog"
 main_branch = 'master'
 
 [project.Knut.dependencies.tree_sitter]
-submodule = "3rdparty/tree-sitter"
+submodule_path = "3rdparty/tree-sitter"
 main_branch = 'master'
 
 [project.Knut.dependencies.tree_sitter_cpp]
-submodule = "3rdparty/tree-sitter-cpp"
+submodule_path = "3rdparty/tree-sitter-cpp"
 main_branch = 'master'
 
 [project.Knut.dependencies.tree_sitter_qmljs]
-submodule = "3rdparty/tree-sitter-qmljs"
+submodule_path = "3rdparty/tree-sitter-qmljs"
 main_branch = 'master'
 
 [project.hotspot]
@@ -143,9 +143,9 @@ main_branch = "master"
 
 # we probably don't want to manage hotspot dependencies automatically
 # [project.hotspot.dependencies.PrefixTickLabels]
-# # submodule = "3rdparty/PrefixTickLabels" no releases
+# # submodule_path = "3rdparty/PrefixTickLabels" no releases
 # main_branch = 'master'
 
 # [project.hotspot.dependencies.perfparser]
-# submodule = "3rdparty/perfparser"
+# submodule_path = "3rdparty/perfparser"
 # main_branch = 'hotspot'

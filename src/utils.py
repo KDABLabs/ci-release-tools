@@ -80,7 +80,7 @@ def get_builtin_dependencies(name):
     '''
     Returns the dependencies portion of releasing.toml
     For example, for 'KDStateMachineEditor it can return:
-        {'graphviz': {'submodule': '3rdparty/graphviz'} }
+        {'graphviz': {'submodule_path': '3rdparty/graphviz'} }
     '''
     proj = get_project(name)
     try:
@@ -95,7 +95,7 @@ def get_submodule_builtin_dependencies(name):
     '''
 
     deps = get_builtin_dependencies(name)
-    return {k: v for k, v in deps.items() if 'submodule' in v}
+    return {k: v for k, v in deps.items() if 'submodule_path' in v}
 
 
 def download_file_as_string(filename):
