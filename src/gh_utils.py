@@ -297,6 +297,7 @@ def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):
         current_version = get_submodule_dependency_version(repo_path)
 
         result.append({
+            'submodule_name': key,  # the key in releasing.yml
             'submodule_path': dep['submodule_path'],
             'current_version': current_version,
             'latest_version': latest_version
