@@ -47,7 +47,7 @@ def print_dependencies(proj_name, repo_path):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--print-dependency-versions', dest='proj_name', action='store_true',
+parser.add_argument('--print-dependency-versions', action='store_true',
                     help="prints dependency versions", required=False)
 
 parser.add_argument('--proj-name', metavar='<path>',
