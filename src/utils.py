@@ -42,7 +42,11 @@ def run_command_with_output(command, cwd=None):
     if cwd:
         os.chdir(cwd)
     try:
-        output = os.popen(command).read()
+        process = os.popen(command)
+        output = process.read()
+        exit_code = process.close()
+        if exit_code:
+            print(f"cmd failed: {command} cwd={cwd}")
     finally:
         if cwd:
             os.chdir(current_dir)
