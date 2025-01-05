@@ -1,0 +1,3 @@
+[submodule "tests/submodules/knut"]
+	path = tests/submodules/knut
+	url = https://github.com/KDAB/knut.git
