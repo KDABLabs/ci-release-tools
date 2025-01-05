@@ -123,7 +123,7 @@ main_branch = 'master'
 
 [project.Knut.dependencies.spdlog]
 submodule_path = "3rdparty/spdlog"
-main_branch = 'master'
+main_branch = 'v1.x'
 
 [project.Knut.dependencies.tree_sitter]
 submodule_path = "3rdparty/tree-sitter"
