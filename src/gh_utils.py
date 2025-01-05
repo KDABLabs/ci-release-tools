@@ -11,6 +11,7 @@
 
 import json
 import argparse
+import uuid
 from utils import get_projects, repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project, get_submodule_builtin_dependencies
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
 from changelog_utils import get_changelog
@@ -267,6 +268,13 @@ def get_submodule_dependency_version(repo_path):
     return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags HEAD").strip()
 
 
+def checkout_randomly_named_branch(repo_path, prefix):
+    branch = f"{prefix}/{str(uuid.uuid4())}"
+    if run_command(f"git -C {repo_path} checkout -B {branch}"):
+        return branch
+    return None
+
+
 def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):
     '''
         returns the list of submodule current and latest versions for give project
@@ -287,7 +295,7 @@ def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):
 
     result = []
     for key, dep in deps.items():
-        if key == submodule_name:
+        if submodule_name and key != submodule_name:
             continue
 
         repo_path = master_repo_path + '/' + dep['submodule_path']
@@ -327,6 +335,75 @@ def print_submodule_versions(repo_paths):
             else:
                 print(
                     f"    {submodule_path}: {current_version} -> ????")
+
+
+def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch):
+    proj = get_project(proj_name)
+
+    if 'dependencies' not in proj:
+        print(
+            f"Project {proj} does not have any dependencies, check releasing.toml")
+        return False
+
+    deps = proj['dependencies']
+
+    if submodule_name not in deps:
+        print(
+            f"No submodule {submodule_name} in dependencies. dependencies={deps}")
+        return False
+
+    if not branch:
+        branch = proj.get('main_branch', 'main')
+
+    submodule = deps[submodule_name]
+    if 'submodule_path' not in submodule:
+        print(
+            f"Expected 'submodule_path' key with the submodule path. Got={submodule}")
+        return False
+
+    submodule_path = repo_path + '/' + submodule['submodule_path']
+    versions = get_submodule_versions(repo_path, proj_name, submodule_name)
+    if len(versions) != 1:
+        print("Could not get submodule versions")
+        return False
+
+    versions = versions[0]
+
+    if not sha1:
+        if versions['current_version'] == versions['latest_version'] or versions['current_version'] == 'latest':
+            # already latest
+            return True
+
+        sha1 = versions['latest_version']
+
+    if not run_command(f"git -C {repo_path} checkout {branch}"):
+        return False
+
+    tmp_branch = checkout_randomly_named_branch(repo_path, "bump")
+    if not tmp_branch:
+        return False
+
+    if not run_command(f"git -C {submodule_path} checkout {sha1}"):
+        return False
+
+    if not run_command(f"git -C {repo_path} add {submodule['submodule_path']}"):
+        return False
+
+    commit_msg = f"\"Bump {submodule_name} from {versions['current_version']} to {sha1}\""
+
+    if not run_command(f"git -C {repo_path} commit --author \"KDAB GitHub Actions <gh@kdab>\"-m {commit_msg}"):
+        return False
+
+    if not run_command(f"git -C {repo_path} push {remote} {tmp_branch}"):
+        return False
+
+    if not run_command(f"git -C {repo_path} push --set-upstream {remote} {tmp_branch}"):
+        return False
+
+    if not run_command(f"gh pr create -R KDAB/{proj_name} --base {branch} -H {tmp_branch} --title {commit_msg} --body \"Automatically created via GH action.\""):
+        return False
+
+    return True
 
 
 if __name__ == "__main__":
