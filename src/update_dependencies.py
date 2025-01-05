@@ -31,16 +31,16 @@ def print_dependencies(proj_name, repo_path):
     for version in versions:
         latest_version = version['latest_version']
         current_version = version['current_version']
-        submodule_name = version['submodule_name']
+        submodule_path = version['submodule_path']
 
         if latest_version == current_version or current_version == 'latest':
             print(
-                f"::notice::{submodule_name} is up to date ({latest_version})")
+                f"::notice::{submodule_path} is up to date ({latest_version})")
         elif latest_version:
             print(
-                f"::warning::{submodule_name} {current_version} can be bumped to {latest_version}")
+                f"::warning::{submodule_path} {current_version} can be bumped to {latest_version}")
         else:
-            print(f"::error::Can't determine version of {submodule_name}")
+            print(f"::error::Can't determine version of {submodule_path}")
 
     if versions:
         print("::endgroup::")

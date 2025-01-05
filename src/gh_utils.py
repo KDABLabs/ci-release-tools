@@ -297,7 +297,7 @@ def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):
         current_version = get_submodule_dependency_version(repo_path)
 
         result.append({
-            'submodule_name': dep['submodule_path'],
+            'submodule_path': dep['submodule_path'],
             'current_version': current_version,
             'latest_version': latest_version
         })
@@ -315,17 +315,17 @@ def print_submodule_versions(repo_paths):
         for version in versions:
             latest_version = version['latest_version']
             current_version = version['current_version']
-            submodule_name = version['submodule_name']
+            submodule_path = version['submodule_path']
 
             if latest_version == current_version or current_version == 'latest':
                 print(
-                    f"    {submodule_name}: {current_version}")
+                    f"    {submodule_path}: {current_version}")
             elif latest_version:
                 print(
-                    f"    {submodule_name}: {current_version} ({latest_version} is available)")
+                    f"    {submodule_path}: {current_version} ({latest_version} is available)")
             else:
                 print(
-                    f"    {submodule_name}: {current_version} -> ????")
+                    f"    {submodule_path}: {current_version} -> ????")
 
 
 if __name__ == "__main__":
