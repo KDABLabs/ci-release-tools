@@ -115,18 +115,23 @@ main_branch = 'master'
 
 [project.Knut.dependencies.nlohmann_json]
 submodule = "3rdparty/nlohmann-json"
+main_branch = 'master'
 
 [project.Knut.dependencies.pugixml]
 submodule = "3rdparty/pugixml"
+main_branch = 'master'
 
 [project.Knut.dependencies.spdlog]
 submodule = "3rdparty/spdlog"
+main_branch = 'master'
 
 [project.Knut.dependencies.tree_sitter]
 submodule = "3rdparty/tree-sitter"
+main_branch = 'master'
 
 [project.Knut.dependencies.tree_sitter_cpp]
 submodule = "3rdparty/tree-sitter-cpp"
+main_branch = 'master'
 
 [project.Knut.dependencies.tree_sitter_qmljs]
 submodule = "3rdparty/tree-sitter-qmljs"
