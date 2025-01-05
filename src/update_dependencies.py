@@ -66,7 +66,7 @@ parser.add_argument('--branch', metavar='<branch>',
                     help="Remote branch, defaults to the main branch", required=False)
 
 parser.add_argument('--sha1', metavar='<sha1, tag or branch>',
-                    help="Sha tag or branch, defaults to latest", required=False, default='latest')
+                    help="Sha tag or branch, defaults to latest", required=False)
 
 args = parser.parse_args()
 
