@@ -391,7 +391,7 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch)
 
     commit_msg = f"\"Bump {submodule_name} from {versions['current_version']} to {sha1}\""
 
-    if not run_command(f"git -C {repo_path} commit --author \"KDAB GitHub Actions <gh@kdab>\"-m {commit_msg}"):
+    if not run_command(f"git -C {repo_path} commit --author \"KDAB GitHub Actions <gh@kdab>\" -m {commit_msg}"):
         return False
 
     if not run_command(f"git -C {repo_path} push {remote} {tmp_branch}"):
