@@ -379,7 +379,7 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch)
     if not run_command(f"git -C {repo_path} checkout {branch}"):
         return False
 
-    tmp_branch = checkout_randomly_named_branch(repo_path, "bump")
+    tmp_branch = checkout_randomly_named_branch(repo_path, "gh-actions")
     if not tmp_branch:
         return False
 
