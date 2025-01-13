@@ -269,7 +269,7 @@ def get_submodule_dependency_version(repo_path):
 
 
 def checkout_randomly_named_branch(repo_path, prefix):
-    branch = f"{prefix}/{str(uuid.uuid4())}"
+    branch = f"{prefix}-{str(uuid.uuid4())}"
     if run_command(f"git -C {repo_path} checkout -B {branch}"):
         return branch
     return None
