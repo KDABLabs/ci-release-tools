@@ -259,14 +259,16 @@ def ci_run_status(proj_name, sha1):
     return in_progress, completed, failed
 
 
-def get_submodule_dependency_version(repo_path):
+def get_head_version(repo_path, sha1='HEAD'):
     '''
-    Runs git-describe on a sub-module, for example:
+    Returns the tagged version of a repo located at repo_path.
+
+    Runs git-describe on a git repo, for example:
         git -C ../KDStateMachineEditor/3rdparty/graphviz describe --tags HEAD
         which returns: 11.0.0-546-gb4650ee85
     This won't update/init submodules, be sure to not run on an old checkout.
     '''
-    return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags HEAD").strip()
+    return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags {sha1}").strip()
 
 
 def checkout_randomly_named_branch(repo_path, prefix):
@@ -327,7 +329,7 @@ def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):
         submodule_main_branch = dep.get('main_branch', 'main')
         latest_version = get_latest_release_tag_in_github(
             None, repo_path, submodule_main_branch, True)
-        current_version = get_submodule_dependency_version(repo_path)
+        current_version = get_head_version(repo_path)
 
         result.append({
             'submodule_name': key,  # the key in releasing.yml
