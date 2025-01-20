@@ -45,7 +45,7 @@ def test_submodule_versions():
 
 def test_fetchcontent_versions():
     '''
-    Tests gh_utils.get_fetchcontent_versions()
+    Tests gh_utils.get_current_fetchcontent_sha1s()
     We have kdutils as a submodule, do not bump it
     '''
 
