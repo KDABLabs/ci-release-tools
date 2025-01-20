@@ -1,3 +1,6 @@
 [submodule "tests/submodules/knut"]
 	path = tests/submodules/knut
 	url = https://github.com/KDAB/knut.git
+[submodule "tests/submodules/kdutils"]
+	path = tests/submodules/kdutils
+	url = https://github.com/KDAB/kdutils.git

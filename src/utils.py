@@ -98,6 +98,15 @@ def get_submodule_builtin_dependencies(name):
     return {k: v for k, v in deps.items() if 'submodule_path' in v}
 
 
+def get_fetchcontent_builtin_dependencies(name):
+    '''
+    Like get_builtin_dependencies() but only honours fetchcontent, not submodules
+    '''
+
+    deps = get_builtin_dependencies(name)
+    return {k: v for k, v in deps.items() if 'fetchcontent_path' in v}
+
+
 def download_file_as_string(filename):
     '''
     Downloads a file and returns it as a string
@@ -131,3 +140,50 @@ def create_tarball_with_submodules(proj_name, sha1, version):
         run_command(f"git -C {clone_dir} submodule update --init --recursive")
         run_command(
             f"tar --exclude='.git' -C {temp_dir} -czvf {proj_name.lower()}-{version}.tar.gz {proj_name.lower()}-{version}")
+
+
+def get_fetchcontents_from_code(cmake_code):
+    '''
+    Parses code and returns 1 line per fetchcontents_declare
+    '''
+    fetchcontents = []
+    lines = cmake_code.split('\n')
+    for i, line in enumerate(lines):
+        if line.strip().startswith('#') or line.strip().startswith('//'):
+            continue
+
+        if 'fetchcontent_declare' in line.lower():
+            line = line.strip()
+            if line.endswith('\\') or line.count('(') > line.count(')'):
+                j = i + 1
+                while j < len(lines):
+                    if not lines[j].strip().startswith('#'):
+                        line += ' ' + lines[j].strip()
+                    if not lines[j].strip().endswith('\\') and line.count('(') == line.count(')'):
+                        break
+                    j += 1
+            fetchcontents.append(line)
+
+    # Each line is for example:
+    # 'FetchContent_Declare( fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281)'
+    result = []
+    for line in fetchcontents:
+        parts = [s.strip() for s in line.split()]
+
+        try:
+            name = parts[parts.index('GIT_REPOSITORY') - 1]
+            if '(' in name:
+                name = name.split('(')[1].strip(',')
+            repo = parts[parts.index('GIT_REPOSITORY') +
+                         1].strip(')').strip(',')
+            sha1 = parts[parts.index('GIT_TAG') + 1].strip(')')
+
+            result.append({
+                'name': name,
+                'repo': repo,
+                'sha1': sha1
+            })
+        except (ValueError, IndexError):
+            continue
+
+    return result

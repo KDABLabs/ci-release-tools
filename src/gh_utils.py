@@ -13,6 +13,7 @@ import json
 import argparse
 import uuid
 from utils import get_projects, repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project, get_submodule_builtin_dependencies
+import utils
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
 from changelog_utils import get_changelog
 
@@ -273,6 +274,30 @@ def checkout_randomly_named_branch(repo_path, prefix):
     if run_command(f"git -C {repo_path} checkout -B {branch}"):
         return branch
     return None
+
+
+def get_current_fetchcontent_sha1s(repo_path, proj_name, dep_name=None):
+    '''
+    Returns the current shas of our fetchcontent dependencies.
+    Example:
+        shas = gh_utils.get_current_fetchcontent_sha1s(kdutils_dir, 'KDUtils')
+     would return: [{'name': 'fmt', 'repo': 'https://github.com/fmtlib/fmt.git', 'sha1': 'e69e5f977d458f2650bb346dadf2ad30c5320281'}, (etc...) ]
+    '''
+
+    deps = utils.get_fetchcontent_builtin_dependencies(proj_name)
+    if not deps.items():
+        return []
+
+    result = []
+    for key, dep in deps.items():
+        if dep_name and dep_name != key:
+            continue
+
+        cmake_filename = repo_path + '/' + dep['fetchcontent_path']
+        with open(cmake_filename, 'r', encoding='UTF-8') as file:
+            cmake_code = file.read()
+            result.extend(utils.get_fetchcontents_from_code(cmake_code))
+    return result
 
 
 def get_submodule_versions(master_repo_path, proj_name, submodule_name=None):

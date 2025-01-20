@@ -95,6 +95,24 @@ signed_release = false
 homebrew = ["kdutils.rb"]
 main_branch = "main"
 
+[project.KDUtils.dependencies.KDBindings]
+fetchcontent_path = "cmake/dependencies.cmake"
+
+[project.KDUtils.dependencies.fmt]
+fetchcontent_path = "cmake/dependencies.cmake"
+
+[project.KDUtils.dependencies.spdlog]
+fetchcontent_path = "cmake/dependencies.cmake"
+
+[project.KDUtils.dependencies.whereami]
+fetchcontent_path = "cmake/dependencies.cmake"
+
+[project.KDUtils.dependencies.mio]
+fetchcontent_path = "cmake/dependencies.cmake"
+
+[project.KDUtils.dependencies.doctest]
+fetchcontent_path = "tests/CMakeLists.txt"
+
 [project.Knut]
 has_version_txt = true
 
