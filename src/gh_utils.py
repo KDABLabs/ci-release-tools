@@ -292,13 +292,38 @@ def get_current_fetchcontent_sha1s(repo_path, proj_name, dep_name=None):
 
     result = []
     for key, dep in deps.items():
+
         if dep_name and dep_name != key:
             continue
 
         cmake_filename = repo_path + '/' + dep['fetchcontent_path']
         with open(cmake_filename, 'r', encoding='UTF-8') as file:
             cmake_code = file.read()
-            result.extend(utils.get_fetchcontents_from_code(cmake_code))
+            fetch_content = utils.get_fetchcontents_from_code(cmake_code, key)[
+                0]
+            fetch_content['main_branch'] = dep['main_branch']
+            result.append(fetch_content)
+    return result
+
+
+def get_fetchcontent_versions(repo_path, proj_name, dep_name=None):
+    deps = get_current_fetchcontent_sha1s(repo_path, proj_name, dep_name)
+    result = []
+
+    for dep in deps:
+        def get_versions(dep_repo_path):
+            current = get_head_version(dep_repo_path, dep['sha1'])
+            latest = None
+            if current:
+                latest = get_latest_release_tag_in_github(
+                    None, dep_repo_path, dep['main_branch'], True)
+            return (current, latest)
+
+        current_version, latest_version = utils.clone_repo(
+            dep['repo'], get_versions)
+        result.append(
+            {'name': dep['name'], 'current_version': current_version, 'latest_version': latest_version})
+
     return result
 
 

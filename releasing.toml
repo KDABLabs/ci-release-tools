@@ -97,21 +97,27 @@ main_branch = "main"
 
 [project.KDUtils.dependencies.KDBindings]
 fetchcontent_path = "cmake/dependencies.cmake"
+main_branch = "main"
 
 [project.KDUtils.dependencies.fmt]
 fetchcontent_path = "cmake/dependencies.cmake"
+main_branch = "master"
 
 [project.KDUtils.dependencies.spdlog]
 fetchcontent_path = "cmake/dependencies.cmake"
+main_branch = "v1.x"
 
 [project.KDUtils.dependencies.whereami]
 fetchcontent_path = "cmake/dependencies.cmake"
+main_branch = "master"
 
 [project.KDUtils.dependencies.mio]
 fetchcontent_path = "cmake/dependencies.cmake"
+main_branch = "master"
 
 [project.KDUtils.dependencies.doctest]
 fetchcontent_path = "tests/CMakeLists.txt"
+main_branch = "master"
 
 [project.Knut]
 has_version_txt = true

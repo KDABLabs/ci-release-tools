@@ -23,7 +23,7 @@ def run_command_silent(command):
     runs a command but doesn't print to stdout/stderr
     '''
     result = subprocess.run(
-        command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
     return result.returncode == 0
 
 
@@ -142,7 +142,18 @@ def create_tarball_with_submodules(proj_name, sha1, version):
             f"tar --exclude='.git' -C {temp_dir} -czvf {proj_name.lower()}-{version}.tar.gz {proj_name.lower()}-{version}")
 
 
-def get_fetchcontents_from_code(cmake_code):
+def clone_repo(repo, callback):
+    '''
+    Clones repo into a temporary directory.
+    Executes callback and deletes directory.
+    '''
+    with tempfile.TemporaryDirectory() as temp_dir:
+        if run_command_silent(f"git clone {repo} {temp_dir}"):
+            return callback(temp_dir)
+        return False
+
+
+def get_fetchcontents_from_code(cmake_code, dep_name=None):
     '''
     Parses code and returns 1 line per fetchcontents_declare
     '''
@@ -177,6 +188,9 @@ def get_fetchcontents_from_code(cmake_code):
             repo = parts[parts.index('GIT_REPOSITORY') +
                          1].strip(')').strip(',')
             sha1 = parts[parts.index('GIT_TAG') + 1].strip(')')
+
+            if dep_name and dep_name != name:
+                continue
 
             result.append({
                 'name': name,
