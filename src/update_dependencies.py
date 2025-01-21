@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-# Prints and updates dependency versions for submodules
+# Prints and updates dependency versions for submodules/fetchcontent
 # Example, called by github to print:
 # Print dependencies:
 # ./src/update_dependencies.py --print-dependency-versions --proj-name KDStateMachineEditor --repo-path ../KDStateMachineEditor
