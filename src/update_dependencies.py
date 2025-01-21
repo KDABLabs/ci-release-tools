@@ -78,5 +78,5 @@ args = parser.parse_args()
 if args.print_dependency_versions:
     print_dependencies(args.proj_name, args.repo_path)
 elif args.dependency_name:
-    gh_utils.update_submodule(args.proj_name, args.dependency_name,
-                              args.new_sha1, args.repo_path, args.remote, args.branch)
+    gh_utils.update_dependency(args.proj_name, args.dependency_name,
+                               args.new_sha1, args.repo_path, args.remote, args.branch)

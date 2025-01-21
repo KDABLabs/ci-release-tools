@@ -187,7 +187,7 @@ def get_fetchcontents_from_code(cmake_code, dep_name=None):
                 name = name.split('(')[1].strip(',')
             repo = parts[parts.index('GIT_REPOSITORY') +
                          1].strip(')').strip(',')
-            sha1 = parts[parts.index('GIT_TAG') + 1].strip(')')
+            sha1 = parts[parts.index('GIT_TAG') + 1].strip(')').strip()
 
             if dep_name and dep_name != name:
                 continue
@@ -201,3 +201,33 @@ def get_fetchcontents_from_code(cmake_code, dep_name=None):
             continue
 
     return result
+
+
+def set_fetchcontent_sha1(filename, old_sha1, new_sha1, tag_name=None):
+    '''
+    Replaces GIT_TAG old sha1 with new sha1.
+    It's a dumb replace, does not support if the sha1 appears more than once for whatever reason
+    '''
+    with open(filename, 'r', encoding='UTF-8') as f:
+        content = f.read()
+
+        lines = content.split('\n')
+        for i, line in enumerate(lines):
+            if line.strip().startswith('#'):
+                continue
+
+            if old_sha1 in line:
+                # Remove any existing comment
+                line = line.split('#')[0].rstrip()
+                if tag_name:
+                    lines[i] = line.replace(
+                        old_sha1, f"{new_sha1} # {tag_name}")
+                else:
+                    lines[i] = line.replace(old_sha1, new_sha1)
+
+        content = '\n'.join(lines)
+
+        with open(filename, 'w', encoding='UTF-8') as f:
+            f.write(content)
+
+    return True

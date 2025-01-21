@@ -302,6 +302,7 @@ def get_current_fetchcontent_sha1s(repo_path, proj_name, dep_name=None):
             fetch_content = utils.get_fetchcontents_from_code(cmake_code, key)[
                 0]
             fetch_content['main_branch'] = dep['main_branch']
+            fetch_content['fetchcontent_path'] = dep['fetchcontent_path']
             result.append(fetch_content)
     return result
 
@@ -314,19 +315,30 @@ def get_fetchcontent_versions(repo_path, proj_name, dep_name=None):
         def get_versions(dep_repo_path):
             current = get_head_version(dep_repo_path, dep['sha1'])
             latest = None
+            latest_sha1 = None
             if current:
                 latest = get_latest_release_tag_in_github(
                     None, dep_repo_path, dep['main_branch'], True)
-            return (current, latest)
+                latest_sha1 = run_command_with_output(
+                    f"git -C {dep_repo_path} rev-parse {latest}").strip()
+
+            return (current, latest, latest_sha1)
 
         current_version = None
         latest_version = None
+        latest_version_sha1 = None
         clone_result = utils.clone_repo(dep['repo'], get_versions)
         if clone_result and isinstance(clone_result, tuple):
-            current_version, latest_version = clone_result
+            current_version, latest_version, latest_version_sha1 = clone_result
 
         result.append(
-            {'name': dep['name'], 'current_version': current_version, 'latest_version': latest_version})
+            {'name': dep['name'],
+             'fetchcontent_path': dep['fetchcontent_path'],
+             'current_version': current_version,
+             'current_version_sha1': dep['sha1'],
+             'latest_version': latest_version,
+             'latest_version_sha1': latest_version_sha1
+             })
 
     return result
 
@@ -393,30 +405,60 @@ def print_submodule_versions(repo_paths):
                     f"    {submodule_path}: {current_version} -> ????")
 
 
-def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch):
+def update_dependency(proj_name, dep_name, sha1, repo_path, remote, branch):
     proj = get_project(proj_name)
-
     if 'dependencies' not in proj:
         print(
             f"Project {proj} does not have any dependencies, check releasing.toml")
         return False
 
-    deps = proj['dependencies']
-
-    if submodule_name not in deps:
-        print(
-            f"No submodule {submodule_name} in dependencies. dependencies={deps}")
-        return False
-
     if not branch:
         branch = proj.get('main_branch', 'main')
 
-    submodule = deps[submodule_name]
-    if 'submodule_path' not in submodule:
-        print(
-            f"Expected 'submodule_path' key with the submodule path. Got={submodule}")
+    deps = proj['dependencies']
+    dep = deps[dep_name]
+    if 'submodule_path' in dep:
+        return update_submodule(proj_name, dep_name, sha1, repo_path, remote, branch)
+
+    if 'fetchcontent_path' in dep:
+        return update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch)
+
+    print("Dependency is neither a submodule or a FetchContent, check releasing.toml")
+    return False
+
+
+def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
+    '''
+    Like update_submodule() but bumps a FetchContent dependency.
+    '''
+
+    versions = get_fetchcontent_versions(repo_path, proj_name, dep_name)
+    versions = versions[0]
+    tag_name = None
+    current_sha1 = versions['current_version_sha1']
+
+    if not sha1:
+        if versions['current_version'] == versions['latest_version'] or versions['current_version'] == 'latest':
+            # already latest
+            return True
+
+        sha1 = versions['latest_version_sha1']
+        tag_name = versions['latest_version']
+
+    cmake_filename = repo_path + '/' + versions['fetchcontent_path']
+    if not utils.set_fetchcontent_sha1(cmake_filename, current_sha1, sha1, tag_name):
+        print(f'Error while editing {cmake_filename}')
         return False
 
+    return False
+
+
+def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch):
+    proj = get_project(proj_name)
+
+    deps = proj['dependencies']
+
+    submodule = deps[submodule_name]
     submodule_path = repo_path + '/' + submodule['submodule_path']
     versions = get_submodule_versions(repo_path, proj_name, submodule_name)
     if len(versions) != 1:
