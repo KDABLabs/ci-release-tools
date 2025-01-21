@@ -71,7 +71,7 @@ parser.add_argument('--branch', metavar='<branch>',
                     help="Remote branch, defaults to the main branch", required=False)
 
 parser.add_argument('--sha1', metavar='<sha1, tag or branch>',
-                    help="Sha tag or branch, defaults to latest", required=False)
+                    help="Sha tag or branch, defaults to latest", dest='new_sha1', required=False)
 
 args = parser.parse_args()
 
@@ -79,4 +79,4 @@ if args.print_dependency_versions:
     print_dependencies(args.proj_name, args.repo_path)
 elif args.dependency_name:
     gh_utils.update_submodule(args.proj_name, args.dependency_name,
-                              args.sha1, args.repo_path, args.remote, args.branch)
+                              args.new_sha1, args.repo_path, args.remote, args.branch)
