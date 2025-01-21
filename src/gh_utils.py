@@ -319,8 +319,12 @@ def get_fetchcontent_versions(repo_path, proj_name, dep_name=None):
                     None, dep_repo_path, dep['main_branch'], True)
             return (current, latest)
 
-        current_version, latest_version = utils.clone_repo(
-            dep['repo'], get_versions)
+        current_version = None
+        latest_version = None
+        clone_result = utils.clone_repo(dep['repo'], get_versions)
+        if clone_result and isinstance(clone_result, tuple):
+            current_version, latest_version = clone_result
+
         result.append(
             {'name': dep['name'], 'current_version': current_version, 'latest_version': latest_version})
 
