@@ -62,7 +62,7 @@ parser.add_argument('--repo-path', metavar='<path>',
                     help="Path to repository", required=True)
 
 parser.add_argument('--update-dependency', metavar='<dependency name>',
-                    help="Dependency name", required=False)
+                    help="Dependency name", required=False, dest='dependency_name')
 
 parser.add_argument('--remote', metavar='<remote>',
                     help="Remote, defaults to origin", required=False, default='origin')
@@ -77,6 +77,6 @@ args = parser.parse_args()
 
 if args.print_dependency_versions:
     print_dependencies(args.proj_name, args.repo_path)
-elif args.update_dependency:
-    gh_utils.update_submodule(args.proj_name, args.update_dependency,
+elif args.dependency_name:
+    gh_utils.update_submodule(args.proj_name, args.dependency_name,
                               args.sha1, args.repo_path, args.remote, args.branch)
