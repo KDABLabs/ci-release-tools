@@ -432,9 +432,16 @@ def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
     Like update_submodule() but bumps a FetchContent dependency.
     '''
 
+    if not run_command(f"git -C {repo_path} checkout {branch}"):
+        return False
+
+    tmp_branch = checkout_randomly_named_branch(repo_path, "gh-actions")
+    if not tmp_branch:
+        return False
+
     versions = get_fetchcontent_versions(repo_path, proj_name, dep_name)
     versions = versions[0]
-    tag_name = None
+    tag_name = sha1  # gets replaced by a name if we have it
     current_sha1 = versions['current_version_sha1']
 
     if not sha1:
@@ -448,6 +455,23 @@ def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
     cmake_filename = repo_path + '/' + versions['fetchcontent_path']
     if not utils.set_fetchcontent_sha1(cmake_filename, current_sha1, sha1, tag_name):
         print(f'Error while editing {cmake_filename}')
+        return False
+
+    if not run_command(f"git -C {repo_path} add {cmake_filename}"):
+        return False
+
+    commit_msg = f"\"Bump {dep_name} from {versions['current_version']} to {tag_name}\""
+
+    if not run_command(f"git -C {repo_path} commit --author \"KDAB GitHub Actions <gh@kdab>\" -m {commit_msg}"):
+        return False
+
+    if not run_command(f"git -C {repo_path} push {remote} {tmp_branch}"):
+        return False
+
+    if not run_command(f"git -C {repo_path} push --set-upstream {remote} {tmp_branch}"):
+        return False
+
+    if not run_command(f"gh pr create -R KDAB/{proj_name} --base {branch} -H {tmp_branch} --title {commit_msg} --body \"Automatically created via GH action.\""):
         return False
 
     return False
