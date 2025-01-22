@@ -13,6 +13,8 @@ path = [
     ".pre-commit-config.yaml",
     ".pylintrc",
     ".gitmodules",
+    "workflows/submodule-bump.yml",
+    "workflows/README.md",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>"
