@@ -5,7 +5,7 @@
 on:
   workflow_dispatch:
     inputs:
-      submodule:
+      dependency:
         type: choice
         description: "Select an option"
         options: #
@@ -14,7 +14,7 @@ on:
           - fmt # CHANGE-ME
           - kdalgorithms # CHANGE-ME
 
-name: bump submodules
+name: bump dependencies
 
 env:
   PROJECT_NAME: Knut # CHANGE-ME
@@ -25,10 +25,8 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-        with:
-          submodules: false
 
-      - name: Checkout submodule
+      - name: Checkout ci-release-tools
         run: |
           git clone https://github.com/KDABLabs/ci-release-tools.git
 
@@ -38,15 +36,15 @@ jobs:
           git config --global user.email "gh@kdab"
 
       - name: Print current and available versions
-        if: inputs.submodule == 'Only print current and available versions'
+        if: inputs.dependency == 'Only print current and available versions'
         run: |
           python3 ./ci-release-tools/src/update_dependencies.py --print-dependency-versions --proj-name ${{ env.PROJECT_NAME }} --repo-path .
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Bump submodule
-        if: inputs.submodule != 'Only print current and available versions'
+      - name: Bump dependency
+        if: inputs.dependency != 'Only print current and available versions'
         run: |
-          python3 ./ci-release-tools/src/update_dependencies.py --update-dependency ${{inputs.submodule}} --proj-name ${{ env.PROJECT_NAME }} --repo-path . --owner ${{ github.repository_owner }}
+          python3 ./ci-release-tools/src/update_dependencies.py --update-dependency ${{inputs.dependency}} --proj-name ${{ env.PROJECT_NAME }} --repo-path . --owner ${{ github.repository_owner }}
         env:
           GH_TOKEN: ${{ github.token }}
