@@ -271,7 +271,10 @@ def get_head_version(repo_path, sha1='HEAD'):
     return run_command_with_output(f"git -C {repo_path} describe --abbrev=0 --tags {sha1}").strip()
 
 
-def checkout_randomly_named_branch(repo_path, prefix):
+def checkout_randomly_named_branch(repo_path, prefix, base_branch=None):
+    if base_branch and not run_command(f"git -C {repo_path} checkout {base_branch}"):
+        return False
+
     branch = f"{prefix}-{str(uuid.uuid4())}"
     if run_command(f"git -C {repo_path} checkout -B {branch}"):
         return branch
@@ -432,9 +435,6 @@ def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
     Like update_submodule() but bumps a FetchContent dependency.
     '''
 
-    if not run_command(f"git -C {repo_path} checkout {branch}"):
-        return False
-
     tmp_branch = checkout_randomly_named_branch(repo_path, "gh-actions")
     if not tmp_branch:
         return False
@@ -462,19 +462,10 @@ def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
 
     commit_msg = f"\"Bump {dep_name} from {versions['current_version']} to {tag_name}\""
 
-    if not run_command(f"git -C {repo_path} commit --author \"KDAB GitHub Actions <gh@kdab>\" -m {commit_msg}"):
+    if not commit_and_push_pr(commit_msg, f"KDAB/{proj_name}", repo_path, remote, branch, tmp_branch):
         return False
 
-    if not run_command(f"git -C {repo_path} push {remote} {tmp_branch}"):
-        return False
-
-    if not run_command(f"git -C {repo_path} push --set-upstream {remote} {tmp_branch}"):
-        return False
-
-    if not run_command(f"gh pr create -R KDAB/{proj_name} --base {branch} -H {tmp_branch} --title {commit_msg} --body \"Automatically created via GH action.\""):
-        return False
-
-    return False
+    return True
 
 
 def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch):
@@ -498,9 +489,6 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch)
 
         sha1 = versions['latest_version']
 
-    if not run_command(f"git -C {repo_path} checkout {branch}"):
-        return False
-
     tmp_branch = checkout_randomly_named_branch(repo_path, "gh-actions")
     if not tmp_branch:
         return False
@@ -512,7 +500,13 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch)
         return False
 
     commit_msg = f"\"Bump {submodule_name} from {versions['current_version']} to {sha1}\""
+    if not commit_and_push_pr(commit_msg, f"KDAB/{proj_name}", repo_path, remote, branch, tmp_branch):
+        return False
 
+    return True
+
+
+def commit_and_push_pr(commit_msg, gh_repo, repo_path, remote, branch, tmp_branch):
     if not run_command(f"git -C {repo_path} commit --author \"KDAB GitHub Actions <gh@kdab>\" -m {commit_msg}"):
         return False
 
@@ -522,7 +516,7 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch)
     if not run_command(f"git -C {repo_path} push --set-upstream {remote} {tmp_branch}"):
         return False
 
-    if not run_command(f"gh pr create -R KDAB/{proj_name} --base {branch} -H {tmp_branch} --title {commit_msg} --body \"Automatically created via GH action.\""):
+    if not run_command(f"gh pr create -R {gh_repo} --base {branch} -H {tmp_branch} --title {commit_msg} --body \"Automatically created via GH action.\""):
         return False
 
     return True
