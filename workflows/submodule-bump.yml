@@ -47,6 +47,6 @@ jobs:
       - name: Bump submodule
         if: inputs.submodule != 'Only print current and available versions'
         run: |
-          python3 ./ci-release-tools/src/update_dependencies.py --update-dependency ${{inputs.submodule}} --proj-name ${{ env.PROJECT_NAME }} --repo-path .
+          python3 ./ci-release-tools/src/update_dependencies.py --update-dependency ${{inputs.submodule}} --proj-name ${{ env.PROJECT_NAME }} --repo-path . --owner ${{ github.repository_owner }}
         env:
           GH_TOKEN: ${{ github.token }}

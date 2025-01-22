@@ -408,7 +408,7 @@ def print_submodule_versions(repo_paths):
                     f"    {submodule_path}: {current_version} -> ????")
 
 
-def update_dependency(proj_name, dep_name, sha1, repo_path, remote, branch):
+def update_dependency(proj_name, dep_name, sha1, repo_path, remote, branch, owner='KDAB'):
     proj = get_project(proj_name)
     if 'dependencies' not in proj:
         print(
@@ -421,16 +421,16 @@ def update_dependency(proj_name, dep_name, sha1, repo_path, remote, branch):
     deps = proj['dependencies']
     dep = deps[dep_name]
     if 'submodule_path' in dep:
-        return update_submodule(proj_name, dep_name, sha1, repo_path, remote, branch)
+        return update_submodule(proj_name, dep_name, sha1, repo_path, remote, branch, owner)
 
     if 'fetchcontent_path' in dep:
-        return update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch)
+        return update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch, owner)
 
     print("Dependency is neither a submodule or a FetchContent, check releasing.toml")
     return False
 
 
-def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
+def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch, owner='KDAB'):
     '''
     Like update_submodule() but bumps a FetchContent dependency.
     '''
@@ -462,13 +462,13 @@ def update_fetchcontent(proj_name, dep_name, sha1, repo_path, remote, branch):
 
     commit_msg = f"\"Bump {dep_name} from {versions['current_version']} to {tag_name}\""
 
-    if not commit_and_push_pr(commit_msg, f"KDAB/{proj_name}", repo_path, remote, branch, tmp_branch):
+    if not commit_and_push_pr(commit_msg, f"{owner}/{proj_name}", repo_path, remote, branch, tmp_branch):
         return False
 
     return True
 
 
-def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch):
+def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch, owner='KDAB'):
     proj = get_project(proj_name)
 
     deps = proj['dependencies']
@@ -500,7 +500,7 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch)
         return False
 
     commit_msg = f"\"Bump {submodule_name} from {versions['current_version']} to {sha1}\""
-    if not commit_and_push_pr(commit_msg, f"KDAB/{proj_name}", repo_path, remote, branch, tmp_branch):
+    if not commit_and_push_pr(commit_msg, f"{owner}/{proj_name}", repo_path, remote, branch, tmp_branch):
         return False
 
     return True
