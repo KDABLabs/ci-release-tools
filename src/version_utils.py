@@ -5,6 +5,9 @@
 
 import re
 from utils import download_file_as_string, get_project
+from packaging import version
+import argparse
+import sys
 
 
 def previous_version(version):
@@ -65,3 +68,46 @@ def is_numeric(version):
         return True
     except:
         return False
+
+def has_newer_version(version_in_use, latest_version):
+    """
+    Compare two semantic version strings.
+    Returns True if version_in_use < latest_version, False if version_in_use == latest_version.
+    This function expects that latest_version is greater or equal than version_in_use.
+    If this is not true, this function raises ValueError.
+    """
+    version_in_use_parsed = version.parse(version_in_use)
+    latest_version_parsed = version.parse(latest_version)
+    if version_in_use_parsed < latest_version_parsed:
+        return True
+    elif version_in_use_parsed == latest_version_parsed:
+        return False
+    else:
+        raise ValueError(f"Error: Version {version_in_use} is greater than {latest_version}.")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--has-newer-version",
+        nargs=2,
+        metavar=("VERSION_IN_USE", "LATEST_VERSION"),
+        help="Check if VERSION_IN_USE is less than LATEST_VERSION.",
+    )
+    args = parser.parse_args()
+
+    if args.has_newer_version:
+        version_in_use, latest_version = args.has_newer_version
+        try:
+            result = has_newer_version(version_in_use, latest_version)
+            if result:
+                print("true")
+                sys.exit(0)
+            else:
+                print("false")
+                sys.exit(0)
+        except ValueError as e:
+            print(e)
+            sys.exit(1)
+
+    parser.print_help()
+    sys.exit(1)
