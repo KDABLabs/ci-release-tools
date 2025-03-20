@@ -8,6 +8,7 @@
 # Example, called by github to print:
 # Print dependencies:
 # ./src/update_dependencies.py --print-dependency-versions --proj-name KDStateMachineEditor --repo-path ../KDStateMachineEditor
+# ./src/update_dependencies.py --update-dependency kdalgorithms --repo-path ../knut --proj-name Knut
 
 import argparse
 import gh_utils

@@ -484,7 +484,7 @@ def update_submodule(proj_name, submodule_name, sha1, repo_path, remote, branch,
 
     if not sha1:
         if versions['current_version'] == versions['latest_version'] or versions['current_version'] == 'latest':
-            # already latest
+            print(f"Already at latest version {versions['latest_version']}")
             return True
 
         sha1 = versions['latest_version']
