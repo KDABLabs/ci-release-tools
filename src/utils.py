@@ -116,7 +116,7 @@ def download_file_as_string(filename):
         with urllib.request.urlopen(filename) as response:
             result = response.read().decode('utf-8')
     except Exception as e:
-        exit_because(f"Failed to download changelog: {e}")
+        exit_because(f"Failed to download {filename}: {e}")
 
     return result
 
