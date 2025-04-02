@@ -17,3 +17,9 @@ Scripts related to GitHub, for example:
 ```bash
 ./src/create_release.py --repo KDAlgorithms --tag 1.4 --releasenotes 1.4_notes.txt
 ```
+
+### Sign and upload tarball+signature
+
+```bash
+python3 src/sign_and_upload.py --repo KDDockWidgets --version 2.2.3
+```
