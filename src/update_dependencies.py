@@ -29,27 +29,30 @@ def print_dependencies(proj_name, repo_path):
     if versions:
         print("::group::Versions")
 
-    # Print with annotation tags so it appears under GH actions results
-    for version in versions:
-        latest_version = version['latest_version']
-        current_version = version['current_version']
-        name = ''
-        if 'submodule_path' in version:
-            name = version['submodule_path']
-        else:
-            name = version['name']
+        # Print with annotation tags so it appears under GH actions results
+        for version in versions:
+            latest_version = version['latest_version']
+            current_version = version['current_version']
+            name = ''
+            if 'submodule_path' in version:
+                name = version['submodule_path']
+            else:
+                name = version['name']
 
-        if (latest_version and latest_version == current_version) or current_version == 'latest':
-            print(
-                f"::notice::{name} is up to date ({latest_version})")
-        elif latest_version:
-            print(
-                f"::warning::{name} {current_version} can be bumped to {latest_version}")
-        else:
-            print(f"::error::Can't determine version of {name}")
+            if (latest_version and latest_version == current_version) or current_version == 'latest':
+                print(
+                    f"::notice::{name} is up to date ({latest_version})")
+            elif latest_version:
+                print(
+                    f"::warning::{name} {current_version} can be bumped to {latest_version}")
+            else:
+                print(f"::error::Can't determine version of {name}")
 
-    if versions:
-        print("::endgroup::")
+        if versions:
+            print("::endgroup::")
+    else:
+        print(
+            f"::warning::No dependencies found for {proj_name} in {repo_path}")
 
 
 parser = argparse.ArgumentParser()
