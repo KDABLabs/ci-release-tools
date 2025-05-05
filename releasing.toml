@@ -121,10 +121,10 @@ main_branch = "master"
 
 [project.Knut]
 has_version_txt = true
-
 tag_prefix = "v"
 signed_release = true
 main_branch = "main"
+
 [project.Knut.dependencies]
 [project.Knut.dependencies.extra_cmake_modules]
 submodule_path = "3rdparty/extra-cmake-modules"
