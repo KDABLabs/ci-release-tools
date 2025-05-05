@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
+# SPDX-License-Identifier: MIT
+
 #!/bin/bash
 
 # Downloads all repos of our organization, 11 GB (as of 2025)
