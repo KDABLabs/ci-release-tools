@@ -29,7 +29,7 @@ main_branch = "master"
 [project.KDSoap.dependencies]
 [project.KDSoap.dependencies.libkode]
 # libkode has no tags
-# submodule = "kdwsdl2cpp/libkode"
+# submodule_path = "kdwsdl2cpp/libkode"
 
 [project.KDReports]
 signed_release = true
@@ -52,7 +52,7 @@ homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
 [project.KDStateMachineEditor.dependencies]
 [project.KDStateMachineEditor.dependencies.graphviz]
-submodule = "3rdparty/graphviz"
+submodule_path = "3rdparty/graphviz"
 
 [project.KDSingleApplication]
 tag_prefix = "v"
@@ -68,7 +68,7 @@ main_branch = "master"
 
 [project.GammaRay.dependencies]
 [project.GammaRay.dependencies.KDStateMachineEditor]
-submodule = "3rdparty/KDStateMachineEditor"
+submodule_path = "3rdparty/KDStateMachineEditor"
 
 
 [project.KDChart]
