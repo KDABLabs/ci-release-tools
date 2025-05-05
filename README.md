@@ -23,3 +23,9 @@ Scripts related to GitHub, for example:
 ```bash
 python3 src/sign_and_upload.py --repo KDDockWidgets --version 2.2.3
 ```
+
+## Get versions of submodules or FetchContent dependencies
+
+```bash
+python3 ci-release-tools/src/update_dependencies.py --print-dependency-versions --proj-name KDStateMachineEditor --repo-path KDStateMachineEditor
+```
