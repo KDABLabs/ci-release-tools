@@ -17,12 +17,25 @@ def get_kddockwidgets_changelog(version, sha1):
     return ""
 
 
+def get_kdstatemachineeditor_changelog(version, sha1):
+    filename = f"https://raw.githubusercontent.com/KDAB/KDStateMachineEditor/{sha1}/CHANGES"
+    text = download_file_as_string(filename)
+
+    sections = text.split('Version ')
+    for section in sections:
+        if section.startswith(version):
+            return 'Version ' + section.strip()
+    return ""
+
+
 def get_changelog(proj_name, version, sha1):
     '''
     Gets the changelog for the specified version
     '''
     if proj_name == 'KDDockWidgets':
         return get_kddockwidgets_changelog(version, sha1)
+    if proj_name == 'KDStateMachineEditor':
+        return get_kdstatemachineeditor_changelog(version, sha1)
 
     raise Exception(
         f"Don't know how to get changelog for project {proj_name}. IMPLEMENT ME")
