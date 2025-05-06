@@ -45,6 +45,7 @@ main_branch = "main"
 has_version_txt = true
 
 [project.KDStateMachineEditor]
+has_version_txt = true
 tag_prefix = "v"
 signed_release = true
 main_branch = "master"
