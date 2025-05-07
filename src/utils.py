@@ -12,6 +12,8 @@ import subprocess
 import tempfile
 import urllib.request
 
+VERBOSE = os.getenv("VERBOSE", "0") == "1"
+
 
 def exit_because(reason):
     print(reason)
@@ -42,6 +44,9 @@ def run_command_with_output(command, cwd=None):
     if cwd:
         os.chdir(cwd)
     try:
+        if VERBOSE:
+            print(f"run_command_with_output: {command} cwd:{os.getcwd()}")
+
         process = os.popen(command)
         output = process.read()
         exit_code = process.close()
