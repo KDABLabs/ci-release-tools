@@ -70,7 +70,7 @@ main_branch = "master"
 [project.GammaRay.dependencies]
 [project.GammaRay.dependencies.KDStateMachineEditor]
 submodule_path = "3rdparty/KDStateMachineEditor"
-
+main_branch = "master"
 
 [project.KDChart]
 tag_prefix = "v"
