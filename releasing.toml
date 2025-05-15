@@ -66,6 +66,7 @@ tag_prefix = "v"
 signed_release = true
 homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
 main_branch = "master"
+has_version_txt = true
 
 [project.GammaRay.dependencies]
 [project.GammaRay.dependencies.KDStateMachineEditor]
