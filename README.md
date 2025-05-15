@@ -15,7 +15,13 @@ Scripts related to GitHub, for example:
 ### Create a release
 
 ```bash
-./src/create_release.py --repo KDAlgorithms --tag 1.4 --releasenotes 1.4_notes.txt
+./src/create_release.py --repo KDDockWidgets --version 2.2.1 --sha1 3aaccddc00a11a643e0959a24677838993de15ac --repo-path path/to/KDDockWidgets/
+```
+
+### Testing Changelog related code
+
+```bash
+./src/create_release.py --only-print-changelog --repo KDDockWidgets --version 2.2.1 --sha1 3aaccddc00a11a643e0959a24677838993de15ac --repo-path path/to/KDDockWidgets/
 ```
 
 ### Sign and upload tarball+signature
