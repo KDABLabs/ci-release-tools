@@ -15,6 +15,7 @@ import os
 import argparse
 import gh_utils
 import changelog_utils
+import utils
 
 parser = argparse.ArgumentParser()
 
@@ -30,8 +31,11 @@ parser.add_argument("--only-print-changelog", help="Only print the changelog wit
 
 args = parser.parse_args()
 
+# Fix repository name casing by comparing with releasing.toml
+repo_name = utils.get_correct_repo_case(args.repo)
+
 release_notes = changelog_utils.get_changelog(
-    args.repo, args.version, args.sha1)
+    repo_name, args.version, args.sha1)
 
 if not os.path.exists(args.repo_path):
     print(f"Error: Repository path {args.repo_path} does not exist")
@@ -45,7 +49,7 @@ if args.only_print_changelog:
     print(release_notes)
     sys.exit(0)
 
-result = gh_utils.create_release(args.repo, args.version,
+result = gh_utils.create_release(repo_name, args.version,
                                  args.sha1, release_notes, args.repo_path, args.sign)
 
 sys.exit(0 if result else -1)

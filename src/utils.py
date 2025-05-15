@@ -126,6 +126,22 @@ def download_file_as_string(filename):
     return result
 
 
+def get_correct_repo_case(repo_name):
+    '''
+    Get the correct casing of a repository name by comparing with releasing.toml.
+    Returns the repository name with corrected case if found, or the original name otherwise.
+
+    Args:
+        repo_name: The repository name to correct
+    '''
+    projects = get_projects()
+    if projects:
+        for project in projects:
+            if project.lower() == repo_name.lower():
+                return project
+    return repo_name
+
+
 def tag_for_version(proj_name, version):
     proj = get_project(proj_name)
     return f"{proj['tag_prefix']}{version}"
