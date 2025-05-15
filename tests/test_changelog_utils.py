@@ -18,8 +18,8 @@ def test_get_kdstatemachineeditor_changelog():
     changelog = get_changelog("KDStateMachineEditor", version, sha1)
 
     # Verify the changelog contains expected content
-    assert changelog.startswith(f"Version {version}:")
-    assert "KDStateMachineEditor now looks for Qt6 by default" in changelog
+    assert changelog.startswith(
+        f"* KDStateMachineEditor now looks for Qt6 by default")
 
     # Test with non-existent version
     non_existent = get_changelog("KDStateMachineEditor", "9999.0.0", sha1)
