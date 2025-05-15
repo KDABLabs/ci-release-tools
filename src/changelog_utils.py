@@ -27,10 +27,17 @@ def get_generic_changelog(version, repo, sha1):
     filename = f"https://raw.githubusercontent.com/KDAB/{repo}/{sha1}/CHANGES"
     text = download_file_as_string(filename)
 
+    # Remove lines starting with dashes
+    text = '\n'.join([line for line in text.split(
+        '\n') if not line.strip().startswith('-')])
+
     sections = text.split('Version ')
     for section in sections:
         if section.startswith(version):
-            return 'Version ' + section.strip()
+            lines = section.strip().split('\n', 1)
+            if len(lines) > 1:
+                return lines[1].strip()
+            return ""
     return ""
 
 
