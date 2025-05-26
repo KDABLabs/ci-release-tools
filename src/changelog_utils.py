@@ -8,9 +8,11 @@
 
 from utils import download_file_as_string
 
+# Not KDDW specific anymore, KDSingleApplication uses the same format
 
-def get_kddockwidgets_changelog(version, sha1):
-    filename = f"https://raw.githubusercontent.com/KDAB/KDDockWidgets/{sha1}/Changelog"
+
+def get_kddockwidgets_changelog(proj_name, version, sha1):
+    filename = f"https://raw.githubusercontent.com/KDAB/{proj_name}/{sha1}/Changelog"
     text = download_file_as_string(filename)
 
     sections = text.split('* v')
@@ -45,8 +47,8 @@ def get_changelog(proj_name, version, sha1):
     '''
     Gets the changelog for the specified version
     '''
-    if proj_name == 'KDDockWidgets':
-        return get_kddockwidgets_changelog(version, sha1)
+    if proj_name == 'KDDockWidgets' or proj_name == 'KDSingleApplication':
+        return get_kddockwidgets_changelog(proj_name, version, sha1)
     if proj_name == 'KDStateMachineEditor' or proj_name == 'GammaRay':
         return get_generic_changelog(version, proj_name, sha1)
 

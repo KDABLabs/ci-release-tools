@@ -60,6 +60,7 @@ tag_prefix = "v"
 signed_release = true
 homebrew = ["kdsingleapplication-qt5.rb", "kdsingleapplication-qt6.rb"]
 main_branch = "master"
+has_version_txt = true
 
 [project.GammaRay]
 tag_prefix = "v"
