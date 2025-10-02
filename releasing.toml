@@ -49,6 +49,7 @@ has_version_txt = true
 tag_prefix = "v"
 signed_release = true
 main_branch = "master"
+last_version_supporting_qt5 = "2.1"
 homebrew = ["kdstatemachineeditor-qt5.rb", "kdstatemachineeditor-qt6.rb"]
 
 [project.KDStateMachineEditor.dependencies]
@@ -68,6 +69,7 @@ signed_release = true
 homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
 main_branch = "master"
 has_version_txt = true
+last_version_supporting_qt5 = "3.2"
 
 [project.GammaRay.dependencies]
 [project.GammaRay.dependencies.KDStateMachineEditor]
