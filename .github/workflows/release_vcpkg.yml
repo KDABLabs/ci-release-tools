@@ -1,0 +1,192 @@
+# SPDX-FileCopyrightText: 2025 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
+# SPDX-License-Identifier: MIT
+
+name: vcpkg PR Creation
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: 'The project namespace (change if testing workflow from a fork)'
+        default: 'KDAB'
+      project:
+        type: choice
+        description: "Select a project"
+        options:
+          - "kdsoap"
+          - "kdreports"
+          - "kdbindings"
+          - "kdalgorithms"
+          - "gammaray"
+      port_version:
+        description: "The vcpkg port-version number (0 for a release not yet packaged in vcpkg)"
+        default: 0
+      vcpkg_fork_namespace:
+        description: 'The namespace for the vcpkg fork where the branch will be created'
+        default: 'KDABLabs'
+      vcpkg_origin_namespace:
+        description: 'The namespace for the vcpkg repository where the PR will be created'
+        # default: 'microsoft' # Change this to create PRs directly on the microsoft/vcpkg repository
+        default: 'KDABLabs'
+      force_push:
+        type: boolean
+        description: "Continue if branch already exists (WARNING: force push created branch)"
+        default: false
+
+jobs:
+  prepare-branch:
+    runs-on: ubuntu-24.04
+    outputs:
+      branch: ${{ steps.write-output.outputs.branch }}
+      new_version: ${{ steps.write-output.outputs.new_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: ci-release-tools
+
+      - name: Setup CI_RELEASE_TOOLS environment variable
+        run: |
+          CI_RELEASE_TOOLS=$PWD/ci-release-tools
+          echo "CI_RELEASE_TOOLS=${CI_RELEASE_TOOLS}" | tee -a ${GITHUB_ENV}
+
+      - name: Configure Git committer
+        run: |
+          git config --global user.name "KDAB GitHub Actions"
+          git config --global user.email "gh@kdab"
+
+      - name: Print latest version
+        run: |
+          REPO_VERSION=$(python3 ${CI_RELEASE_TOOLS}/src/gh_utils.py --get-latest-version ${{ inputs.namespace }}/${{ inputs.project }})
+          echo "REPO_VERSION=${REPO_VERSION}" | tee -a ${GITHUB_ENV}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Print current version on vcpkg repository
+        run: |
+          VCPKG_VERSION=$(python3 ${CI_RELEASE_TOOLS}/src/vcpkg_utils.py --get-latest-vcpkg-version ${{ inputs.project }})
+          echo "VCPKG_VERSION=${VCPKG_VERSION}" | tee -a ${GITHUB_ENV}
+
+      - name: Compare versions
+        run: |
+          echo VCPKG_VERSION = $VCPKG_VERSION
+          echo REPO_VERSION = $REPO_VERSION
+          NEW_VERSION_AVAILABLE=$(python3 ${CI_RELEASE_TOOLS}/src/version_utils.py --has-newer-version "$VCPKG_VERSION" "$REPO_VERSION")
+          echo "NEW_VERSION_AVAILABLE=${NEW_VERSION_AVAILABLE}" | tee -a ${GITHUB_ENV}
+
+      - name: Clone vcpkg repository and configure KDAB fork
+        if: env.NEW_VERSION_AVAILABLE == 'true'
+        run: |
+          git clone https://github.com/${{ inputs.vcpkg_origin_namespace }}/vcpkg.git
+          git -C vcpkg remote add fork https://github.com/${{ inputs.vcpkg_fork_namespace }}/vcpkg.git
+          git -C vcpkg remote set-url --push fork https://x-access-token:${{ secrets.FORK_PUSH_TOKEN }}@github.com/${{ inputs.vcpkg_fork_namespace }}/vcpkg.git
+          git -C vcpkg fetch --all --prune
+
+      - name: Check if the branch exists
+        if: env.NEW_VERSION_AVAILABLE == 'true'
+        run: |
+          BRANCH="${{ inputs.project }}_$REPO_VERSION"
+          echo "BRANCH=${BRANCH}" | tee -a ${GITHUB_ENV}
+          BRANCH_EXISTS=$(git -C vcpkg ls-remote --heads fork $BRANCH | grep -q $BRANCH && echo true || echo false)
+          echo "BRANCH_EXISTS=${BRANCH_EXISTS}" | tee -a ${GITHUB_ENV}
+
+      - name: Setup vcpkg
+        if: env.NEW_VERSION_AVAILABLE == 'true' && ( env.BRANCH_EXISTS == 'false' || inputs.force_push == true )
+        run: |
+          cd vcpkg
+          ./bootstrap-vcpkg.sh -disableMetrics
+          echo "VCPKG_ROOT=${PWD}" | tee -a ${GITHUB_ENV}
+
+      # TODO This step could probably be refactored into a python function
+      - name: Create the branch and update the port version
+        if: env.NEW_VERSION_AVAILABLE == 'true' && ( env.BRANCH_EXISTS == 'false' || inputs.force_push == true )
+        run: |
+          cd vcpkg
+          git switch -c $BRANCH
+
+          VCPKG_PORT_PATH="ports/${{ inputs.project }}"
+          VCPKG_JSON_FILE="${VCPKG_PORT_PATH}/vcpkg.json"
+          VCPKG_PORTFILE_CMAKE_FILE="${VCPKG_PORT_PATH}/portfile.cmake"
+
+          sed -i "s|\"version\": \"$VCPKG_VERSION\"|\"version\": \"$REPO_VERSION\"|g" "${VCPKG_JSON_FILE}"
+          if [[ "${{ inputs.port_version }}" -eq 0 ]]; then
+              sed -Ei '/"port-version"/d' "${VCPKG_JSON_FILE}"
+          else
+              if grep -q '"port-version"' "${VCPKG_JSON_FILE}"; then
+                  sed -Ei "s/\"port-version\":[[:space:]]*[0-9]+/\"port-version\": ${{ inputs.port_version }}/" "${VCPKG_JSON_FILE}"
+              else
+                  sed -Ei "/\"version\"/a \"port-version\": ${{ inputs.port_version }}," "${VCPKG_JSON_FILE}"
+              fi
+          fi
+
+          sed -i "s|https://github.com/[^/]\+/|https://github.com/${{ inputs.namespace }}/|g" "${VCPKG_PORTFILE_CMAKE_FILE}"
+
+          ./vcpkg format-manifest "${VCPKG_JSON_FILE}"
+
+          LATEST_RELEASE=$(python3 ${CI_RELEASE_TOOLS}/src/gh_utils.py --get-latest-release KDAB/${{ inputs.project }})
+          curl -o ../${LATEST_RELEASE}.tar.gz https://github.com/${{ inputs.namespace }}/${{ inputs.project }}/archive/refs/tags/${LATEST_RELEASE}.tar.gz
+          SHA512=$(shasum -a 512 ../${LATEST_RELEASE}.tar.gz | awk '{print $1}')
+          sed -i "s|SHA512 [a-fA-F0-9]*|SHA512 ${SHA512}|" "${VCPKG_PORTFILE_CMAKE_FILE}"
+
+          git add "${VCPKG_JSON_FILE}" "${VCPKG_PORTFILE_CMAKE_FILE}"
+          git commit -m "[${{ inputs.project }}] update to $REPO_VERSION"
+
+          ./vcpkg x-add-version --all
+          git add versions
+          git commit --amend --no-edit --date=now
+
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Push the branch on the vcpkg fork
+        if: env.NEW_VERSION_AVAILABLE == 'true' && ( env.BRANCH_EXISTS == 'false' || inputs.force_push == true )
+        run: |
+          cd vcpkg
+          git show
+          git remote set-url fork https://x-access-token:${{ secrets.FORK_PUSH_TOKEN }}@github.com/${{ inputs.vcpkg_fork_namespace }}/vcpkg.git
+
+          MAYBE_FORCE=""
+          if [[ ${{ inputs.force_push }} == true ]]; then
+              MAYBE_FORCE="--force"
+          fi
+          git push ${MAYBE_FORCE} fork ${BRANCH}
+
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Write output when branch is ready
+        id: write-output
+        if: env.NEW_VERSION_AVAILABLE == 'true' && ( env.BRANCH_EXISTS == 'false' || inputs.force_push == true )
+        run: |
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "new_version=${REPO_VERSION}" >> "$GITHUB_OUTPUT"
+
+  # TODO Add test workflow here
+
+  prepare-pull-request:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    needs:
+      - prepare-branch
+    steps:
+      - name: Create the PR body
+        run: |
+          echo "This PR was automatically created by the release workflow." > body.md
+          echo >> body.md
+          echo "Please **double check that everything is in order**, and **update the description** before marking it as \"Ready for review\"." >> body.md
+          echo >> body.md
+          curl -s https://raw.githubusercontent.com/${{ inputs.vcpkg_origin_namespace }}/vcpkg/refs/heads/master/.github/pull_request_template.md >> body.md
+          cat body.md
+
+      - name: Create the PR
+        run: |
+          gh pr create \
+              --head "${{ inputs.vcpkg_fork_namespace }}:${{ needs.prepare-branch.outputs.branch }}" \
+              --base master \
+              --repo "${{ inputs.vcpkg_origin_namespace }}/vcpkg" \
+              --title "[${{ inputs.project }}] Update to ${{ needs.prepare-branch.outputs.new_version }}" \
+              --body-file body.md \
+              --draft
+        env:
+          GH_TOKEN: ${{ secrets.FORK_PUSH_TOKEN }}
