@@ -1,0 +1,56 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_FLAGS": "-DQT_FORCE_ASSERTS",
+        "QT_BUILD_TESTS_BY_DEFAULT": "OFF",
+        "QT_BUILD_EXAMPLES_BY_DEFAULT": "OFF",
+        "QT_BUILD_SUBMODULES": "qtbase;qtshadertools;qtdeclarative;qtsvg;qt5compat;qttools;qtscxml",
+        "QT_NO_SANITIZE_TOOLS": "ON",
+        "INPUT_dbus": "linked",
+        "WARNINGS_ARE_ERRORS" : "OFF"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "profile",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "asan",
+      "inherits": "base",
+      "cacheVariables": {
+        "QT_FEATURE_sanitize_address": "ON",
+        "QT_FEATURE_sanitize_undefined": "ON",
+        "QT_FEATURE_icu": "OFF",
+        "FEATURE_developer_build": "ON",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "tsan",
+      "inherits": "base",
+      "cacheVariables": {
+        "QT_FEATURE_sanitize_thread": "ON",
+        "FEATURE_developer_build": "ON",
+        "QT_FEATURE_icu": "OFF"
+      }
+    }
+  ]
+}

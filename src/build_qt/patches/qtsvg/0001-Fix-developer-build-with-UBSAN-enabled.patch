@@ -1,0 +1,38 @@
+From a5b8b8ff74a39cc258f1e5782891d24494e0d799 Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Sat, 31 Jan 2026 19:01:44 +0100
+Subject: [PATCH] Fix developer build with UBSAN enabled
+
+Undefined Behaviour sanitizer needs extra symbols.
+
+Error happened when linking svgtoqml:
+qtbase/lib/libQt6QuickVectorImageGenerator.so.6.11.0: undefined reference to `typeinfo for QSvgUse'
+---
+ src/svg/qsvggraphics_p.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/svg/qsvggraphics_p.h b/src/svg/qsvggraphics_p.h
+index c7351c6..fcdd1ae 100644
+--- a/src/svg/qsvggraphics_p.h
++++ b/src/svg/qsvggraphics_p.h
+@@ -231,7 +231,7 @@ private:
+     bool m_isTspan;
+ };
+ 
+-class QSvgUse : public QSvgNode
++class Q_AUTOTEST_EXPORT QSvgUse : public QSvgNode
+ {
+ public:
+     QSvgUse(const QPointF &start, QSvgNode *parent, QSvgNode *link);
+@@ -256,7 +256,7 @@ private:
+     mutable bool m_recursing;
+ };
+ 
+-class QSvgVideo : public QSvgNode
++class Q_AUTOTEST_EXPORT QSvgVideo : public QSvgNode
+ {
+ public:
+     void drawCommand(QPainter *, QSvgExtraStates &) override {};
+-- 
+2.34.1
+

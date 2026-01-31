@@ -1,0 +1,35 @@
+From ff41d12ae2d37708e74ac1b58b8f69b94015a51f Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Sat, 31 Jan 2026 18:09:42 +0100
+Subject: [PATCH] Fix qtdeclarative UBSAN build
+
+Error was:
+  qshaderdescription.h:280:12: runtime error: load of value 4440,
+  which is not a valid value for type 'BuiltinType'
+
+Add missing SpvBuiltInViewIndex to BuiltinType enum
+
+The BuiltinType enum in qshaderdescription.h is a copy of SpvBuiltIn_
+from SPIRV-Cross (qtshadertools/src/3rdparty/SPIRV-Cross/spirv.h) but
+was missing the SpvBuiltInViewIndex = 4440 enumerator.
+---
+ src/gui/rhi/qshaderdescription.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/rhi/qshaderdescription.h b/src/gui/rhi/qshaderdescription.h
+index 02492a1598b..d8efe65e4ed 100644
+--- a/src/gui/rhi/qshaderdescription.h
++++ b/src/gui/rhi/qshaderdescription.h
+@@ -274,7 +274,8 @@ public:
+         GlobalInvocationIdBuiltin = 28,
+         LocalInvocationIndexBuiltin = 29,
+         VertexIndexBuiltin = 42,
+-        InstanceIndexBuiltin = 43
++        InstanceIndexBuiltin = 43,
++        SpvBuiltInViewIndex = 4440,
+     };
+ 
+     struct BuiltinVariable {
+-- 
+2.48.1
+

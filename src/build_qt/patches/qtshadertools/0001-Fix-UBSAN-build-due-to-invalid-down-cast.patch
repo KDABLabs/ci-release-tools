@@ -1,0 +1,35 @@
+From 4da939cc5748d8bd0856d708ac62da03b29609c6 Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Sat, 31 Jan 2026 19:15:32 +0000
+Subject: [PATCH] Fix UBSAN build due to invalid down cast
+
+The down cast is OK in practice since the struct is empty.
+---
+ src/3rdparty/SPIRV-Cross/spirv_cross_c.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/SPIRV-Cross/spirv_cross_c.cpp b/src/3rdparty/SPIRV-Cross/spirv_cross_c.cpp
+index 1604385..1472dfb 100644
+--- a/src/3rdparty/SPIRV-Cross/spirv_cross_c.cpp
++++ b/src/3rdparty/SPIRV-Cross/spirv_cross_c.cpp
+@@ -2308,7 +2308,7 @@ spvc_type spvc_compiler_get_type_handle(spvc_compiler compiler, spvc_type_id id)
+ 	// Should only throw if an intentionally garbage ID is passed, but the IDs are not type-safe.
+ 	SPVC_BEGIN_SAFE_SCOPE
+ 	{
+-		return static_cast<spvc_type>(&compiler->compiler->get_type(id));
++		return reinterpret_cast<spvc_type>(&compiler->compiler->get_type(id));
+ 	}
+ 	SPVC_END_SAFE_SCOPE(compiler->context, nullptr)
+ }
+@@ -2551,7 +2551,7 @@ spvc_constant spvc_compiler_get_constant_handle(spvc_compiler compiler, spvc_var
+ {
+ 	SPVC_BEGIN_SAFE_SCOPE
+ 	{
+-		return static_cast<spvc_constant>(&compiler->compiler->get_constant(id));
++		return reinterpret_cast<spvc_constant>(&compiler->compiler->get_constant(id));
+ 	}
+ 	SPVC_END_SAFE_SCOPE(compiler->context, nullptr)
+ }
+-- 
+2.48.1
+

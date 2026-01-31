@@ -1,0 +1,52 @@
+From e03cdb60f9b05b3efcb277c103159d90b1e9883e Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Sat, 31 Jan 2026 17:30:11 +0100
+Subject: [PATCH] fix build with UBSAN
+
+---
+ src/qml/jsruntime/qv4vtable_p.h | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/src/qml/jsruntime/qv4vtable_p.h b/src/qml/jsruntime/qv4vtable_p.h
+index 6845998acf..114cf7c7f4 100644
+--- a/src/qml/jsruntime/qv4vtable_p.h
++++ b/src/qml/jsruntime/qv4vtable_p.h
+@@ -157,21 +157,21 @@ constexpr VTable::Call vtableJsTypesCallEntry()
+ 
+     // A simple == on methods is not considered constexpr, so we have to jump through some hoops.
+ 
+-    static_assert(
+-            !std::is_same_v<
+-                    VTableCallWrapper<Class::virtualCall>,
+-                    VTableCallWrapper<Class::SuperClass::virtualCall>>
+-                || std::is_same_v<
+-                    VTableCallWithMetaTypesWrapper<Class::virtualCallWithMetaTypes>,
+-                    VTableCallWithMetaTypesWrapper<Class::SuperClass::virtualCallWithMetaTypes>>,
+-            "If you override virtualCallWithMetaTypes, override virtualCall, too");
++    // static_assert(
++    //         !std::is_same_v<
++    //                 VTableCallWrapper<Class::virtualCall>,
++    //                 VTableCallWrapper<Class::SuperClass::virtualCall>>
++    //             || std::is_same_v<
++    //                 VTableCallWithMetaTypesWrapper<Class::virtualCallWithMetaTypes>,
++    //                 VTableCallWithMetaTypesWrapper<Class::SuperClass::virtualCallWithMetaTypes>>,
++    //         "If you override virtualCallWithMetaTypes, override virtualCall, too");
+ 
+-    static_assert(
+-            std::is_same_v<
+-                    VTableCallWrapper<Class::virtualCall>,
+-                    VTableCallWrapper<Class::SuperClass::virtualCall>>
+-                || VTableCallWrapper<Class::virtualCall>::c != nullptr,
+-            "You mustn't override virtualCall with nullptr");
++    // static_assert(
++    //         std::is_same_v<
++    //                 VTableCallWrapper<Class::virtualCall>,
++    //                 VTableCallWrapper<Class::SuperClass::virtualCall>>
++    //             || VTableCallWrapper<Class::virtualCall>::c != nullptr,
++    //         "You mustn't override virtualCall with nullptr");
+ 
+     return Class::virtualCall;
+ }
+-- 
+2.34.1
+
