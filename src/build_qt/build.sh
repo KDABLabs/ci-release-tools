@@ -88,5 +88,5 @@ git am < "$SCRIPT_DIR"/patches/qtshadertools/0002-Don-t-build-qsb-with-TSAN.patc
 cd ..
 
 cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"/qt-${QT_VERSION}-${PRESET}
-cmake --build build-${PRESET}/ 
+cmake --build build-${PRESET}/
 cmake --install build-${PRESET}/
