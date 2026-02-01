@@ -23,7 +23,7 @@ fi
 
 PRESET="$1"
 QT_VERSION="$2"
-INSTALL_DIR="$3"
+PARENT_INSTALL_DIR="$3"
 QTSRC_DIR="$4"
 
 case "$PRESET" in
@@ -37,7 +37,7 @@ esac
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-mkdir -p "$INSTALL_DIR"
+mkdir -p "$PARENT_INSTALL_DIR"
 
 if [ ! -d "$QTSRC_DIR" ]; then
     git clone https://github.com/qt/qt5.git -b "$QT_VERSION" --depth 1 --single-branch "$QTSRC_DIR"
@@ -87,6 +87,8 @@ git am < "$SCRIPT_DIR"/patches/qtshadertools/0001-Fix-UBSAN-build-due-to-invalid
 git am < "$SCRIPT_DIR"/patches/qtshadertools/0002-Don-t-build-qsb-with-TSAN.patch || true
 cd ..
 
-cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"/qt-${QT_VERSION}-${PRESET}
+INSTALL_DIR="$PARENT_INSTALL_DIR"/qt-"$QT_VERSION"-"$PRESET"
+rm -rf "${INSTALL_DIR}"
+cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
 cmake --build build-${PRESET}/
 cmake --install build-${PRESET}/
