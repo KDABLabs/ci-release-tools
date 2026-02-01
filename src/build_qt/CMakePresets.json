@@ -12,7 +12,6 @@
         "QT_BUILD_TESTS_BY_DEFAULT": "OFF",
         "QT_BUILD_EXAMPLES_BY_DEFAULT": "OFF",
         "QT_BUILD_SUBMODULES": "qtbase;qtshadertools;qtdeclarative;qtsvg;qt5compat;qttools;qtscxml",
-        "QT_NO_SANITIZE_TOOLS": "ON",
         "INPUT_dbus": "linked",
         "WARNINGS_ARE_ERRORS" : "OFF",
         "QT_FEATURE_icu": "OFF"
