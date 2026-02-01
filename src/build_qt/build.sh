@@ -41,6 +41,10 @@ mkdir -p "$PARENT_INSTALL_DIR"
 
 if [ ! -d "$QTSRC_DIR" ]; then
     git clone https://github.com/qt/qt5.git -b "$QT_VERSION" --depth 1 --single-branch "$QTSRC_DIR"
+else
+    cd "$QTSRC_DIR"
+    git fetch origin "$QT_VERSION"
+    cd ..
 fi
 
 cd "$QTSRC_DIR"/
