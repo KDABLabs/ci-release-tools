@@ -18,6 +18,7 @@ path = [
     "src/build_qt/CMakePresets.json",
     "src/build_qt/patches/qtbase/0001-fix-ubsan.patch",
     "src/build_qt/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch",
+    "src/build_qt/patches/qtdeclarative/0002-Fix-more-UBSAN-linking.patch",
     "src/build_qt/patches/qtshadertools/0001-Fix-UBSAN-build-due-to-invalid-down-cast.patch",
     "src/build_qt/patches/qtshadertools/0002-Don-t-build-qsb-with-TSAN.patch",
     "src/build_qt/patches/qtsvg/0001-Fix-developer-build-with-UBSAN-enabled.patch"

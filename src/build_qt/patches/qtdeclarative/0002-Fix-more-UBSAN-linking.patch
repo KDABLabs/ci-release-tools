@@ -1,0 +1,33 @@
+From 7fc92d2dfb9a64c13b54e957d7e31821aee9fdea Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Sun, 1 Feb 2026 12:43:09 +0000
+Subject: [PATCH] Fix more UBSAN linking
+
+---
+ src/qmlmodels/qqmldelegatemodel_p_p.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/qmlmodels/qqmldelegatemodel_p_p.h b/src/qmlmodels/qqmldelegatemodel_p_p.h
+index e6d296fc6a..4ff0799e98 100644
+--- a/src/qmlmodels/qqmldelegatemodel_p_p.h
++++ b/src/qmlmodels/qqmldelegatemodel_p_p.h
+@@ -17,6 +17,8 @@
+ #include <QtCore/qloggingcategory.h>
+ #include <QtCore/qpointer.h>
+
++#include "qtqmlexports.h"
++
+ //
+ //  W A R N I N G
+ //  -------------
+@@ -84,7 +86,7 @@ public:
+ class QQmlAdaptorModel;
+ class QQDMIncubationTask;
+
+-class QQmlDelegateModelItem : public QObject
++class Q_QML_EXPORT QQmlDelegateModelItem : public QObject
+ {
+     Q_OBJECT
+     Q_PROPERTY(int index READ modelIndex NOTIFY modelIndexChanged)
+--
+2.43.0
