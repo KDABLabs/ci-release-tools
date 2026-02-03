@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 # Called by CI to download a sanitizer enabled Qt build, example:
-# ./ci-download-qt.sh 6.11.0 qt-6.11-asan
+# ./ci-download-qt.sh qt-v6.11.0-beta2-debug
 
 set -e
 
@@ -18,18 +18,16 @@ error_handler() {
 
 trap error_handler EXIT
 
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 <tag> <qt package name>"
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <qt package name>"
     exit 1
 fi
 
-TAG="$1"
-PACKAGE_NAME="$2"
+PACKAGE_NAME="$1"
 TARBALL="${PACKAGE_NAME}.tar.zst"
 DEST=~/Qt/${PACKAGE_NAME}
 
-wget -O /tmp/${TARBALL} https://github.com/KDABLabs/ci-release-tools/releases/download/${TAG}/${TARBALL}
-
+wget -O /tmp/${TARBALL} https://github.com/KDABLabs/ci-release-tools/releases/download/qt-sanitizer-developer-builds/${TARBALL}
 rm -rf ${DEST}
 mkdir -p ${DEST}
 
