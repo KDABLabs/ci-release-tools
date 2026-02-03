@@ -1,36 +1,40 @@
-From f5104c70ec02a6241cebdb9c9e8143bcf7661c2a Mon Sep 17 00:00:00 2001
+From 275560b16303f3094a7655e031f1b4f30a885697 Mon Sep 17 00:00:00 2001
 From: Sergio Martins <sergio.martins@kdab.com>
 Date: Sat, 31 Jan 2026 22:59:42 +0000
 Subject: [PATCH] Don't build qsb with TSAN
 
 It hangs or is just very slow to build anything with
 ---
- tools/qsb/CMakeLists.txt | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/qsb/CMakeLists.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/tools/qsb/CMakeLists.txt b/tools/qsb/CMakeLists.txt
-index 334fb0a..833db0f 100644
+index 334fb0a..aaa0cc6 100644
 --- a/tools/qsb/CMakeLists.txt
 +++ b/tools/qsb/CMakeLists.txt
-@@ -7,6 +7,8 @@
+@@ -7,6 +7,10 @@
  ## qsb Tool:
  #####################################################################
  
-+qt_internal_skip_sanitizer()
++if (QT_FEATURE_sanitize_thread)
++    qt_internal_skip_sanitizer()
++endif()
 +
  qt_get_tool_target_name(target_name qsb)
  qt_internal_add_tool(${target_name}
      TOOLS_TARGET # special case
-@@ -22,6 +24,9 @@ qt_internal_add_tool(${target_name}
+@@ -22,6 +26,11 @@ qt_internal_add_tool(${target_name}
      EXTRA_CMAKE_INCLUDES
          "${QT_CMAKE_EXPORT_NAMESPACE}ShaderToolsMacros.cmake"
  )
 +
-+qt_internal_skip_linking_sanitizer()
++if (QT_FEATURE_sanitize_thread)
++    qt_internal_skip_linking_sanitizer()
++endif()
 +
  qt_internal_return_unless_building_tools()
  
  #### Keys ignored in scope 1:.:.:qsb.pro:<TRUE>:
 -- 
-2.43.0
+2.52.0
 
