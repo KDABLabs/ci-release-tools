@@ -74,7 +74,7 @@ else
 fi
 
 echo "Uploading tarball to GitHub Releases..."
-gh release upload "$GH_RELEASE_NAME" "$TARBALL" --repo KDABLabs/ci-release-tools
+gh release upload "$GH_RELEASE_NAME" "$TARBALL" --repo KDABLabs/ci-release-tools --clobber
 
 echo "Tarball created: $TARBALL at https://github.com/KDABLabs/ci-release-tools/releases/tag/$GH_RELEASE_NAME"
 cleanup
