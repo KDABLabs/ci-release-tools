@@ -14,7 +14,15 @@
         "QT_BUILD_SUBMODULES": "qtbase;qtshadertools;qtdeclarative;qtsvg;qt5compat;qttools;qtscxml",
         "INPUT_dbus": "linked",
         "WARNINGS_ARE_ERRORS" : "OFF",
-        "QT_FEATURE_icu": "OFF"
+        "QT_FEATURE_icu": "OFF",
+        "QT_FEATURE_xcb": "ON"
+      }
+    },
+    {
+      "name": "qtbase-only",
+      "inherits": "base",
+      "cacheVariables": {
+        "QT_BUILD_SUBMODULES": "qtbase"
       }
     },
     {
