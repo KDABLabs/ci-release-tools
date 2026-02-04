@@ -11,11 +11,12 @@
         "CMAKE_CXX_FLAGS": "-DQT_FORCE_ASSERTS",
         "QT_BUILD_TESTS_BY_DEFAULT": "OFF",
         "QT_BUILD_EXAMPLES_BY_DEFAULT": "OFF",
-        "QT_BUILD_SUBMODULES": "qtbase;qtshadertools;qtdeclarative;qtsvg;qt5compat;qttools;qtscxml",
+        "QT_BUILD_SUBMODULES": "qtbase;qtshadertools;qtdeclarative;qtsvg;qt5compat;qttools;qtscxml;qtremoteobjects",
         "INPUT_dbus": "linked",
         "WARNINGS_ARE_ERRORS" : "OFF",
         "QT_FEATURE_icu": "OFF",
-        "QT_FEATURE_xcb": "ON"
+        "QT_FEATURE_xcb": "ON",
+        "CMAKE_CXX_COMPILER_LAUNCHER":"ccache"
       }
     },
     {

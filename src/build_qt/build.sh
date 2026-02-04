@@ -43,9 +43,12 @@ if [ ! -d "$QTSRC_DIR" ]; then
     git clone https://github.com/qt/qt5.git -b "$QT_VERSION" --depth 1 --single-branch "$QTSRC_DIR"
 else
     cd "$QTSRC_DIR"
+    echo "Updating Qt source directory at '$QTSRC_DIR'"
     git fetch origin "$QT_VERSION"
     cd ..
 fi
+
+echo "Building Qt $QT_VERSION with preset '$PRESET' in '$PARENT_INSTALL_DIR' from source at '$QTSRC_DIR'"
 
 cd "$QTSRC_DIR"/
 git checkout "$QT_VERSION"
@@ -95,5 +98,5 @@ cd ..
 INSTALL_DIR="$PARENT_INSTALL_DIR"/qt-"$QT_VERSION"-"$PRESET"
 rm -rf "${INSTALL_DIR}"
 cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-cmake --build build-${PRESET}/
+cmake --build build-${PRESET}/ --verbose
 cmake --install build-${PRESET}/
