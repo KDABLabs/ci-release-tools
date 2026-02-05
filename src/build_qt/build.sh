@@ -95,6 +95,10 @@ git am < "$SCRIPT_DIR"/patches/qtshadertools/0001-Fix-UBSAN-build-due-to-invalid
 git am < "$SCRIPT_DIR"/patches/qtshadertools/0002-Don-t-build-qsb-with-TSAN.patch || true
 cd ..
 
+cd qtwayland/
+git am < "$SCRIPT_DIR"/patches/qtwayland/0001-compositor-Avoid-overflow-for-infiniteRegion.patch || true
+cd ..
+
 INSTALL_DIR="$PARENT_INSTALL_DIR"/qt-"$QT_VERSION"-"$PRESET"
 rm -rf "${INSTALL_DIR}"
 cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"

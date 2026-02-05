@@ -1,0 +1,38 @@
+From 11306bc95988c513090be6684dbd66ecd9faaf2b Mon Sep 17 00:00:00 2001
+From: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+Date: Thu, 20 Mar 2025 12:39:06 +0100
+Subject: [PATCH] compositor: Avoid overflow for infiniteRegion()
+
+The infinite region is just supposed to be an arbitrarily large rectangle that covers everything, but since it's put into a QRegion, its width will be calculated.
+
+Therefore the width has to fit inside an int. We adjust the bounds so that its width becomes exactly numerical_limits<int>::max().
+
+This is caught by 419ebb2770eb606762dcca96978b7b26299aafd9 and the
+series in qtbase.
+
+Fixes: QTBUG-134939
+Change-Id: I03c9ebbba0288594f87a131b0dfc28a104c8c91d
+Reviewed-by: Liang Qi <liang.qi@qt.io>
+Reviewed-by: Paul Olav Tvete <paul.tvete@qt.io>
+---
+ src/compositor/compositor_api/qwaylandsurface.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/compositor/compositor_api/qwaylandsurface.cpp b/src/compositor/compositor_api/qwaylandsurface.cpp
+index b1a40c0f..34fed815 100644
+--- a/src/compositor/compositor_api/qwaylandsurface.cpp
++++ b/src/compositor/compositor_api/qwaylandsurface.cpp
+@@ -72,8 +72,8 @@ public:
+ };
+ }
+ static QRegion infiniteRegion() {
+-    return QRegion(QRect(QPoint(std::numeric_limits<int>::min(), std::numeric_limits<int>::min()),
+-                         QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max())));
++    return QRegion(QRect(QPoint(std::numeric_limits<int>::min()/2+1, std::numeric_limits<int>::min()/2+1),
++                         QPoint(std::numeric_limits<int>::max()/2, std::numeric_limits<int>::max()/2)));
+ }
+ 
+ #ifndef QT_NO_DEBUG
+-- 
+2.52.0
+
