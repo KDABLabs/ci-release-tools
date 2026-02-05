@@ -17,6 +17,7 @@ path = [
     "workflows/README.md",
     "src/build_qt/CMakePresets.json",
     "src/build_qt/patches/qtbase/0001-fix-ubsan.patch",
+    "src/build_qt/patches/qtbase/0002-disable-fsanitize-float-divide-by-zero.patch",
     "src/build_qt/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch",
     "src/build_qt/patches/qtdeclarative/0002-Fix-more-UBSAN-linking.patch",
     "src/build_qt/patches/qtshadertools/0001-Fix-UBSAN-build-due-to-invalid-down-cast.patch",

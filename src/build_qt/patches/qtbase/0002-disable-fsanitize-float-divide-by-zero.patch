@@ -1,0 +1,43 @@
+From b071b09047931e0f837eefad74fdf2ddd849544d Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Thu, 5 Feb 2026 22:06:37 +0100
+Subject: [PATCH] disable -fsanitize=float-divide-by-zero
+
+Lot's of false positives, dividing by 0.0 is fine in hardware
+we care about
+---
+ .../extra-cmake-modules/modules/ECMEnableSanitizers.cmake   | 2 +-
+ mkspecs/common/sanitize.conf                                | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/3rdparty/extra-cmake-modules/modules/ECMEnableSanitizers.cmake b/cmake/3rdparty/extra-cmake-modules/modules/ECMEnableSanitizers.cmake
+index 8d95c69e3a..ec76ba7737 100644
+--- a/cmake/3rdparty/extra-cmake-modules/modules/ECMEnableSanitizers.cmake
++++ b/cmake/3rdparty/extra-cmake-modules/modules/ECMEnableSanitizers.cmake
+@@ -141,7 +141,7 @@ macro (enable_sanitizer_flags sanitize_option)
+         set(XSAN_LINKER_FLAGS "lsan")
+     elseif (${sanitize_option} MATCHES "undefined")
+         check_compiler_version("4.9" "3.1" "99.99")
+-        set(XSAN_COMPILE_FLAGS "-fsanitize=undefined -fsanitize=float-divide-by-zero -fno-omit-frame-pointer -fno-optimize-sibling-calls")
++        set(XSAN_COMPILE_FLAGS "-fsanitize=undefined -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+     elseif (${sanitize_option} MATCHES "fuzzer-no-link")
+         check_compiler_version("99.99" "6.0" "99.99")
+         set(XSAN_COMPILE_FLAGS "-fsanitize=fuzzer-no-link")
+diff --git a/mkspecs/common/sanitize.conf b/mkspecs/common/sanitize.conf
+index 409bd99061..8417fa4c2f 100644
+--- a/mkspecs/common/sanitize.conf
++++ b/mkspecs/common/sanitize.conf
+@@ -21,7 +21,7 @@ QMAKE_SANITIZE_FUZZERNL_CFLAGS    = -fsanitize=fuzzer-no-link
+ QMAKE_SANITIZE_FUZZERNL_CXXFLAGS  = -fsanitize=fuzzer-no-link
+ QMAKE_SANITIZE_FUZZERNL_LFLAGS    = -fsanitize=fuzzer-no-link
+ 
+-QMAKE_SANITIZE_UNDEFINED_CFLAGS   = -fsanitize=undefined -fsanitize=float-divide-by-zero
+-QMAKE_SANITIZE_UNDEFINED_CXXFLAGS = -fsanitize=undefined -fsanitize=float-divide-by-zero
+-QMAKE_SANITIZE_UNDEFINED_LFLAGS   = -fsanitize=undefined -fsanitize=float-divide-by-zero
++QMAKE_SANITIZE_UNDEFINED_CFLAGS   = -fsanitize=undefined
++QMAKE_SANITIZE_UNDEFINED_CXXFLAGS = -fsanitize=undefined
++QMAKE_SANITIZE_UNDEFINED_LFLAGS   = -fsanitize=undefined
+ 
+-- 
+2.34.1
+
