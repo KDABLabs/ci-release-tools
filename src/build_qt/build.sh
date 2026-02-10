@@ -85,6 +85,7 @@ cd ..
 cd qtbase/
 git am < "$SCRIPT_DIR"/patches/qtbase/0001-fix-ubsan.patch || true
 git am < "$SCRIPT_DIR"/patches/qtbase/0002-disable-fsanitize-float-divide-by-zero.patch || true
+git am < "$SCRIPT_DIR"/patches/qtbase/0003-Export-QDeferredDeleteEvent.patch || true
 cd ..
 
 cd qtsvg/

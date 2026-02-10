@@ -1,0 +1,26 @@
+From f7a3f585d976ff29da6e5925dba937701f69816b Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Tue, 10 Feb 2026 13:08:40 +0000
+Subject: [PATCH] Export QDeferredDeleteEvent
+
+Fixes UBSAN build with Gammaray
+---
+ src/corelib/kernel/qcoreevent_p.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corelib/kernel/qcoreevent_p.h b/src/corelib/kernel/qcoreevent_p.h
+index ac90baad9b8..dc7d1b9693f 100644
+--- a/src/corelib/kernel/qcoreevent_p.h
++++ b/src/corelib/kernel/qcoreevent_p.h
+@@ -21,7 +21,7 @@ QT_BEGIN_NAMESPACE
+ 
+ class QCoreApplication;
+ 
+-class QDeferredDeleteEvent : public QEvent
++class Q_CORE_EXPORT QDeferredDeleteEvent : public QEvent
+ {
+     Q_DECL_EVENT_COMMON(QDeferredDeleteEvent)
+ public:
+-- 
+2.53.0
+
