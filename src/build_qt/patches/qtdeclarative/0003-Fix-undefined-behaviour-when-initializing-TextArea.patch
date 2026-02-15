@@ -1,0 +1,61 @@
+From 78f520bdacbbd374645a3f9df1710cff08351f7b Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Sun, 15 Feb 2026 00:25:42 +0000
+Subject: [PATCH] Fix undefined behaviour when initializing TextArea
+
+Pick-to: 6.10
+Task-number: QTBUG-144225
+---
+ src/quicktemplates/qquicktextarea.cpp   | 9 +++++++++
+ src/quicktemplates/qquicktextarea_p_p.h | 1 +
+ 2 files changed, 10 insertions(+)
+
+diff --git a/src/quicktemplates/qquicktextarea.cpp b/src/quicktemplates/qquicktextarea.cpp
+index 4cee361ecb..83ee14e6f0 100644
+--- a/src/quicktemplates/qquicktextarea.cpp
++++ b/src/quicktemplates/qquicktextarea.cpp
+@@ -408,6 +408,10 @@ qreal QQuickTextAreaPrivate::getImplicitHeight() const
+ 
+ void QQuickTextAreaPrivate::implicitWidthChanged()
+ {
++    if (!initialized) {
++        QQuickTextEditPrivate::implicitWidthChanged();
++        return;
++    }
+     Q_Q(QQuickTextArea);
+     QQuickItemPrivate::implicitWidthChanged();
+     emit q->implicitWidthChanged3();
+@@ -415,6 +419,10 @@ void QQuickTextAreaPrivate::implicitWidthChanged()
+ 
+ void QQuickTextAreaPrivate::implicitHeightChanged()
+ {
++    if (!initialized) {
++        QQuickTextEditPrivate::implicitHeightChanged();
++        return;
++    }
+     Q_Q(QQuickTextArea);
+     QQuickItemPrivate::implicitHeightChanged();
+     emit q->implicitHeightChanged3();
+@@ -492,6 +500,7 @@ QQuickTextArea::QQuickTextArea(QQuickItem *parent)
+     : QQuickTextEdit(*(new QQuickTextAreaPrivate), parent)
+ {
+     Q_D(QQuickTextArea);
++    d->initialized = true;
+     setActiveFocusOnTab(true);
+     setAcceptedMouseButtons(Qt::AllButtons);
+     d->setImplicitResizeEnabled(false);
+diff --git a/src/quicktemplates/qquicktextarea_p_p.h b/src/quicktemplates/qquicktextarea_p_p.h
+index 48fc1c59b9..0a8618548b 100644
+--- a/src/quicktemplates/qquicktextarea_p_p.h
++++ b/src/quicktemplates/qquicktextarea_p_p.h
+@@ -121,6 +121,7 @@ public:
+     };
+     QLazilyAllocated<ExtraData> extra;
+ 
++    bool initialized = false;
+     bool resizingBackground = false;
+     QPalette resolvedPalette;
+     QQuickDeferredPointer<QQuickItem> background;
+-- 
+2.48.1
+

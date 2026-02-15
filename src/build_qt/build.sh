@@ -80,6 +80,7 @@ cp "$SCRIPT_DIR/CMakePresets.json" .
 cd qtdeclarative/
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch || true
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0002-Fix-more-UBSAN-linking.patch || true
+git am < "$SCRIPT_DIR"/patches/qtdeclarative/0003-Fix-undefined-behaviour-when-initializing-TextArea.patch || true
 cd ..
 
 cd qtbase/
