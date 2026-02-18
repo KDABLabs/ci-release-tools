@@ -1,0 +1,27 @@
+From 6135e268c3ae856b63adebad0dffc1ac5c60f37a Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Wed, 18 Feb 2026 14:11:14 +0000
+Subject: [PATCH] Fix UB: don't static cast partially deleted base class
+
+Change-Id: Ic43cb34aafcaa5f6af81f3cc675aad4db3c54878
+---
+ src/quicktemplates/qquickindicatorbutton_p.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/quicktemplates/qquickindicatorbutton_p.cpp b/src/quicktemplates/qquickindicatorbutton_p.cpp
+index 7a53a95580..825062d204 100644
+--- a/src/quicktemplates/qquickindicatorbutton_p.cpp
++++ b/src/quicktemplates/qquickindicatorbutton_p.cpp
+@@ -35,8 +35,7 @@ QQuickIndicatorButton::QQuickIndicatorButton(QObject *parent)
+ QQuickIndicatorButton::~QQuickIndicatorButton()
+ {
+     Q_D(QQuickIndicatorButton);
+-    QQuickControl *parentControl = static_cast<QQuickControl *>(parent());
+-    if (parentControl)
++    if (auto *parentControl = dynamic_cast<QQuickControl *>(parent()))
+         QQuickControlPrivate::get(parentControl)->removeImplicitSizeListener(d->indicator);
+ }
+ 
+-- 
+2.53.0
+

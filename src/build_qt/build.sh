@@ -81,6 +81,7 @@ cd qtdeclarative/
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch || true
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0002-Fix-more-UBSAN-linking.patch || true
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0003-Fix-undefined-behaviour-when-initializing-TextArea.patch || true
+git am < "$SCRIPT_DIR"/patches/qtdeclarative/0004-Fix-UB-don-t-static-cast-partially-deleted-base-clas.patch || true
 cd ..
 
 cd qtbase/
