@@ -20,6 +20,7 @@ path = [
     "src/build_qt/patches/qtbase/0001-fix-ubsan.patch",
     "src/build_qt/patches/qtbase/0002-disable-fsanitize-float-divide-by-zero.patch",
     "src/build_qt/patches/qtbase/0003-Export-QDeferredDeleteEvent.patch",
+    "src/build_qt/patches/qtbase/0005-WIP-CMake-Pass-fvisibility-default-when-using-fsanit.patch",
     "src/build_qt/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch",
     "src/build_qt/patches/qtdeclarative/0002-Fix-more-UBSAN-linking.patch",
     "src/build_qt/patches/qtdeclarative/0003-Fix-undefined-behaviour-when-initializing-TextArea.patch",

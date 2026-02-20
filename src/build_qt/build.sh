@@ -27,10 +27,10 @@ PARENT_INSTALL_DIR="$3"
 QTSRC_DIR="$4"
 
 case "$PRESET" in
-    asan|tsan|profile|debug)
+    asan|ubsan|tsan|profile|debug)
         ;;
     *)
-        echo "Error: Invalid preset '$PRESET'. Must be one of: asan, tsan, profile, debug"
+        echo "Error: Invalid preset '$PRESET'. Must be one of: asan, ubsan, tsan, profile, debug"
         exit 1
         ;;
 esac
@@ -79,7 +79,6 @@ cp "$SCRIPT_DIR/CMakePresets.json" .
 
 cd qtdeclarative/
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch || true
-git am < "$SCRIPT_DIR"/patches/qtdeclarative/0002-Fix-more-UBSAN-linking.patch || true
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0003-Fix-undefined-behaviour-when-initializing-TextArea.patch || true
 git am < "$SCRIPT_DIR"/patches/qtdeclarative/0004-Fix-UB-don-t-static-cast-partially-deleted-base-clas.patch || true
 cd ..
@@ -87,11 +86,7 @@ cd ..
 cd qtbase/
 git am < "$SCRIPT_DIR"/patches/qtbase/0001-fix-ubsan.patch || true
 git am < "$SCRIPT_DIR"/patches/qtbase/0002-disable-fsanitize-float-divide-by-zero.patch || true
-git am < "$SCRIPT_DIR"/patches/qtbase/0003-Export-QDeferredDeleteEvent.patch || true
-cd ..
-
-cd qtsvg/
-git am < "$SCRIPT_DIR"/patches/qtsvg/0001-Fix-developer-build-with-UBSAN-enabled.patch || true
+git am < "$SCRIPT_DIR"/patches/qtbase/0005-WIP-CMake-Pass-fvisibility-default-when-using-fsanit.patch || true
 cd ..
 
 cd qtshadertools/
@@ -104,7 +99,9 @@ git am < "$SCRIPT_DIR"/patches/qtwayland/0001-compositor-Avoid-overflow-for-infi
 cd ..
 
 INSTALL_DIR="$PARENT_INSTALL_DIR"/qt-"$QT_VERSION"-"$PRESET"
+BUILD_DIR="build-${PRESET}"
 rm -rf "${INSTALL_DIR}"
+rm -rf "${BUILD_DIR}"
 cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-cmake --build build-${PRESET}/ --verbose
-cmake --install build-${PRESET}/
+cmake --build "$BUILD_DIR"/ --verbose
+cmake --install "$BUILD_DIR"/

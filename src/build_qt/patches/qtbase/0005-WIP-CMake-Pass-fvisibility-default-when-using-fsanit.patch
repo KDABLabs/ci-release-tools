@@ -1,0 +1,35 @@
+From 92dd7738891c20d3dfb397373bf39343b43b3bcf Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Fri, 20 Feb 2026 12:28:32 +0100
+Subject: [PATCH] WIP: CMake: Pass -fvisibility=default when using
+ -fsanitize=undefined
+
+Change-Id: I39d230bab3ff9891874ad2bea9fc8b0e71435265
+---
+ cmake/QtTargetHelpers.cmake | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/cmake/QtTargetHelpers.cmake b/cmake/QtTargetHelpers.cmake
+index da210820bb2..065d2e865b0 100644
+--- a/cmake/QtTargetHelpers.cmake
++++ b/cmake/QtTargetHelpers.cmake
+@@ -718,7 +718,15 @@ endfunction()
+ # Set target properties that are the same for all modules, plugins, executables
+ # and 3rdparty libraries.
+ function(qt_set_common_target_properties target)
+-    if(QT_FEATURE_reduce_exports)
++    if(QT_FEATURE_sanitize_undefined)
++        set_target_properties(${target} PROPERTIES
++            C_VISIBILITY_PRESET default
++            CXX_VISIBILITY_PRESET default
++            OBJC_VISIBILITY_PRESET default
++            OBJCXX_VISIBILITY_PRESET default
++            VISIBILITY_INLINES_HIDDEN 0)
++
++    elseif(QT_FEATURE_reduce_exports)
+         set_target_properties(${target} PROPERTIES
+             C_VISIBILITY_PRESET hidden
+             CXX_VISIBILITY_PRESET hidden
+-- 
+2.43.0
+

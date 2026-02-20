@@ -45,6 +45,14 @@
       "inherits": "base",
       "cacheVariables": {
         "QT_FEATURE_sanitize_address": "ON",
+        "FEATURE_developer_build": "ON",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "ubsan",
+      "inherits": "base",
+      "cacheVariables": {
         "QT_FEATURE_sanitize_undefined": "ON",
         "FEATURE_developer_build": "ON",
         "CMAKE_BUILD_TYPE": "Debug"
