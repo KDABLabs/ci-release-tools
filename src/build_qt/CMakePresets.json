@@ -16,7 +16,8 @@
         "WARNINGS_ARE_ERRORS" : "OFF",
         "QT_FEATURE_icu": "OFF",
         "QT_FEATURE_xcb": "ON",
-        "CMAKE_CXX_COMPILER_LAUNCHER":"ccache"
+        "CMAKE_CXX_COMPILER_LAUNCHER":"ccache",
+        "QT_UNITY_BUILD": "ON"
       }
     },
     {
@@ -45,6 +46,16 @@
       "inherits": "base",
       "cacheVariables": {
         "QT_FEATURE_sanitize_address": "ON",
+        "FEATURE_developer_build": "ON",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "asan_ubsan",
+      "inherits": "base",
+      "cacheVariables": {
+        "QT_FEATURE_sanitize_address": "ON",
+        "QT_FEATURE_sanitize_undefined": "ON",
         "FEATURE_developer_build": "ON",
         "CMAKE_BUILD_TYPE": "Debug"
       }

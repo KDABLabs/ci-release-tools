@@ -17,7 +17,7 @@ trap error_handler EXIT
 
 if [ $# -ne 4 ]; then
     echo "Usage: $0 <preset> <qt-version> <parent-install-dir> <qtsrc-dir>"
-    echo "  preset: asan, tsan, profile, or debug"
+    echo "  preset: asan, asan_ubsan, ubsan, tsan, profile, or debug"
     exit 1
 fi
 
@@ -27,7 +27,7 @@ PARENT_INSTALL_DIR="$3"
 QTSRC_DIR="$4"
 
 case "$PRESET" in
-    asan|ubsan|tsan|profile|debug)
+    asan|asan_ubsan|ubsan|tsan|profile|debug)
         ;;
     *)
         echo "Error: Invalid preset '$PRESET'. Must be one of: asan, ubsan, tsan, profile, debug"
