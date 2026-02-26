@@ -16,6 +16,7 @@ from utils import get_projects, repo_exists, run_command, run_command_with_outpu
 import utils
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
 from changelog_utils import get_changelog
+import re
 
 
 def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag=False):
@@ -52,6 +53,15 @@ def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag=False
         print(f"Failed to get latest release: {e}")
         return None
     return version
+
+
+def extract_version_from_tag(tag):
+    match = re.search(r'\d+(?:\.\d+)*', tag)
+    return match.group(0) if match else None
+
+
+def get_latest_version_in_github(repo, repo_path, main_branch, via_tag=False):
+    return extract_version_from_tag(get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag))
 
 
 def tag_exists(repo, tag):
@@ -526,9 +536,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--get-latest-release', metavar='REPO',
                         help="returns latest release for a repo")
+    parser.add_argument('--get-latest-version', metavar='REPO',
+                        help="returns latest version for a repo")
     args = parser.parse_args()
     if args.get_latest_release:
         print(get_latest_release_tag_in_github(
             args.get_latest_release, None, None))
+    if args.get_latest_version:
+        print(get_latest_version_in_github(
+            args.get_latest_version, None, None))
 
 # print_submodule_versions('..')
