@@ -52,4 +52,9 @@ if args.only_print_changelog:
 result = gh_utils.create_release(repo_name, args.version,
                                  args.sha1, release_notes, args.repo_path, args.sign)
 
+if result:
+    version_no_prefix = args.version.lstrip("v")
+    print(
+        f"::warning::Now run: python3 src/sign_and_upload.py --repo {repo_name} --version {version_no_prefix}")
+
 sys.exit(0 if result else -1)
