@@ -8,15 +8,19 @@
 # Examples:
 # $ gh_utils.py --get-latest-release=KDAB/KDDockWidgets
 # v2.1.0
+#
+# $ gh_utils.py --test-tarball KDSoap --version 2.2.0 --sha1 <sha1>
+# Creates a tarball with submodules for KDSoap 2.2.0 without creating a release
 
 import json
 import argparse
+import re
+import sys
 import uuid
 from utils import get_projects, repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project, get_submodule_builtin_dependencies
 import utils
 from version_utils import is_numeric, previous_version, get_current_version_in_cmake
 from changelog_utils import get_changelog
-import re
 
 
 def get_latest_release_tag_in_github(repo, repo_path, main_branch, via_tag=False):
@@ -105,6 +109,12 @@ def create_tag_via_git(proj_name, version, sha, repo_path):
     return True
 
 
+def sha1_for_tag_remote(repo, tag):
+    output = run_command_with_output(
+        f"gh api repos/KDAB/{repo}/commits/{tag} --jq .sha")
+    return output.strip()
+
+
 def download_tarball(repo, tag, version):
     return run_command_silent(f"curl -L -o {repo.lower()}-{version}.tar.gz https://github.com/KDAB/{repo}/archive/refs/tags/{tag}.tar.gz")
 
@@ -190,7 +200,13 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign):
         print(f"error: release {tag} already exists in {repo}")
         return False
 
-    if not download_tarball(repo, tag, version):
+    proj = get_project(repo)
+    if proj.get('tarball_includes_submodules'):
+        if not utils.create_tarball_with_submodules(repo, sha1, version):
+            print(
+                f"error: failed to create tarball with submodules for {repo}")
+            return False
+    elif not download_tarball(repo, tag, version):
         print(f"error: failed to download tarball from repo {repo}")
         return False
 
@@ -227,7 +243,17 @@ def sign_and_upload(proj_name, version):
         ./src/sign_and_upload.py --repo KDDockWidgets --version 2.2.1
     """
     tag = tag_for_version(proj_name, version)
-    if not download_tarball(proj_name, tag, version):
+    proj = get_project(proj_name)
+    if proj.get('tarball_includes_submodules'):
+        sha1 = sha1_for_tag_remote(proj_name, tag)
+        if not sha1:
+            print(f"error: failed to resolve sha1 for tag {tag}")
+            return False
+        if not utils.create_tarball_with_submodules(proj_name, sha1, version):
+            print(
+                f"error: failed to create tarball with submodules for {proj_name}")
+            return False
+    elif not download_tarball(proj_name, tag, version):
         print(f"error: failed to download tarball for {proj_name}")
         return False
 
@@ -538,6 +564,10 @@ if __name__ == "__main__":
                         help="returns latest release for a repo")
     parser.add_argument('--get-latest-version', metavar='REPO',
                         help="returns latest version for a repo")
+    parser.add_argument('--test-tarball', metavar='REPO',
+                        help="test create_tarball_with_submodules for a repo (requires --version and --sha1)")
+    parser.add_argument('--version', help="version for --test-tarball")
+    parser.add_argument('--sha1', help="sha1 for --test-tarball")
     args = parser.parse_args()
     if args.get_latest_release:
         print(get_latest_release_tag_in_github(
@@ -545,5 +575,12 @@ if __name__ == "__main__":
     if args.get_latest_version:
         print(get_latest_version_in_github(
             args.get_latest_version, None, None))
+    if args.test_tarball:
+        if not args.version or not args.sha1:
+            print("--test-tarball requires --version and --sha1")
+            sys.exit(1)
+        tarball_ok = utils.create_tarball_with_submodules(
+            args.test_tarball, args.sha1, args.version)
+        sys.exit(0 if tarball_ok else 1)
 
 # print_submodule_versions('..')

@@ -155,12 +155,15 @@ def create_tarball_with_submodules(proj_name, sha1, version):
 
     with tempfile.TemporaryDirectory() as temp_dir:
         clone_dir = f"{temp_dir}/{proj_name.lower()}-{version}"
-        run_command(
-            f"git clone https://github.com/KDAB/{proj_name} {clone_dir}")
-        run_command(f"git -C {clone_dir} checkout {sha1}")
-        run_command(f"git -C {clone_dir} submodule update --init --recursive")
-        run_command(
-            f"tar --exclude='.git' -C {temp_dir} -czvf {proj_name.lower()}-{version}.tar.gz {proj_name.lower()}-{version}")
+        if not run_command(f"git clone https://github.com/KDAB/{proj_name} {clone_dir}", fatal=False):
+            return False
+        if not run_command(f"git -C {clone_dir} checkout {sha1}", fatal=False):
+            return False
+        if not run_command(f"git -C {clone_dir} submodule update --init --recursive", fatal=False):
+            return False
+        return run_command(
+            f"tar --exclude='.git' -C {temp_dir} -czvf {proj_name.lower()}-{version}.tar.gz {proj_name.lower()}-{version}",
+            fatal=False)
 
 
 def clone_repo(repo, callback):
