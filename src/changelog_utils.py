@@ -5,6 +5,9 @@
 
 # example test:
 # ./src/create_release.py --only-print-changelog --repo GammaRay --version 3.2.0 --sha1 master --repo-path ../GammaRay
+# ./src/changelog_utils.py KDSoap 2.2.0
+
+import sys
 
 from utils import download_file_as_string
 
@@ -42,6 +45,17 @@ def get_generic_changelog(version, repo, sha1):
             return ""
     return ""
 
+# KDSoap and KDReports have their changelog in the docs folder, and use the version in the filename
+
+
+def get_docs_versioned_changelog(repo, version, sha1):
+    parts = version.split('.')
+    while len(parts) > 2 and parts[-1] == '0':
+        parts.pop()
+    version_underscored = '_'.join(parts)
+    filename = f"https://raw.githubusercontent.com/KDAB/{repo}/{sha1}/docs/CHANGES_{version_underscored}.txt"
+    return download_file_as_string(filename).strip()
+
 
 def get_changelog(proj_name, version, sha1):
     '''
@@ -51,6 +65,18 @@ def get_changelog(proj_name, version, sha1):
         return get_kddockwidgets_changelog(proj_name, version, sha1)
     if proj_name == 'KDStateMachineEditor' or proj_name == 'GammaRay':
         return get_generic_changelog(version, proj_name, sha1)
+    if proj_name in ('KDSoap', 'KDReports'):
+        return get_docs_versioned_changelog(proj_name, version, sha1)
 
     raise Exception(
         f"Don't know how to get changelog for project {proj_name}. IMPLEMENT ME")
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print(f"Usage: {sys.argv[0]} <project> <version> [sha1]")
+        sys.exit(1)
+    proj = sys.argv[1]
+    ver = sys.argv[2]
+    sha = sys.argv[3] if len(sys.argv) > 3 else 'master'
+    print(get_changelog(proj, ver, sha))
