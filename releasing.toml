@@ -25,6 +25,7 @@ tarball_includes_submodules = true
 tag_prefix = "kdsoap-"
 homebrew = ["kdsoap-qt5.rb", "kdsoap-qt6.rb"]
 main_branch = "master"
+has_version_txt = true
 
 [project.KDSoap.dependencies]
 [project.KDSoap.dependencies.libkode]
