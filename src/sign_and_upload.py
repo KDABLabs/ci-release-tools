@@ -12,14 +12,18 @@
 
 import argparse
 import sys
-from gh_utils import sign_and_upload
+from gh_utils import sign_and_upload, verify_signature
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--repo", help="GitHub repository name", required=True)
 parser.add_argument("--version", help="Release version", required=True)
+parser.add_argument("--verify", help="Verify signature instead of signing", action="store_true")
 args = parser.parse_args()
 
-result = sign_and_upload(args.repo, args.version)
+if args.verify:
+    result = verify_signature(args.repo, args.version)
+else:
+    result = sign_and_upload(args.repo, args.version)
 
 sys.exit(0 if result else -1)

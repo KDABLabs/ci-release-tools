@@ -269,6 +269,61 @@ def sign_and_upload(proj_name, version):
     return True
 
 
+def verify_signature(proj_name, version):
+    """
+    Verifies the GPG signature of a released tarball.
+    Downloads the tarball and its .asc signature from the GitHub release, then
+    runs gpg --verify to confirm the signature is valid.
+    For projects with has_version_txt, also checks version.txt inside the tarball.
+    To be run locally, example:
+        ./src/sign_and_upload.py --repo KDDockWidgets --version 2.2.1 --verify
+    """
+    import tarfile as tarfile_module
+
+    tag = tag_for_version(proj_name, version)
+    proj = get_project(proj_name)
+    if proj.get('tarball_includes_submodules'):
+        sha1 = sha1_for_tag_remote(proj_name, tag)
+        if not sha1:
+            print(f"error: failed to resolve sha1 for tag {tag}")
+            return False
+        if not utils.create_tarball_with_submodules(proj_name, sha1, version):
+            print(f"error: failed to create tarball with submodules for {proj_name}")
+            return False
+    elif not download_tarball(proj_name, tag, version):
+        print(f"error: failed to download tarball for {proj_name}")
+        return False
+
+    tarball = f"{proj_name}-{version}.tar.gz".lower()
+
+    if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.asc' --clobber"):
+        print(f"error: failed to download .asc signature for {proj_name} {tag}")
+        return False
+
+    if not run_command(f"gpg --verify {tarball}.asc {tarball}"):
+        print(f"error: GPG signature verification failed for {tarball}")
+        return False
+
+    print(f"Signature verification successful for {tarball}")
+
+    if proj.get('has_version_txt'):
+        with tarfile_module.open(tarball, 'r:gz') as tf:
+            member = next(
+                (m for m in tf.getmembers() if m.name.endswith('/version.txt') or m.name == 'version.txt'),
+                None
+            )
+            if member is None:
+                print(f"error: version.txt not found in {tarball}")
+                return False
+            content = tf.extractfile(member).read().decode().strip()
+            if content != version:
+                print(f"error: version.txt contains '{content}' but expected '{version}'")
+                return False
+        print(f"version.txt matches: {version}")
+
+    return True
+
+
 def ci_run_status(proj_name, sha1):
     output = run_command_with_output(
         f"gh run list -R KDAB/{proj_name} --commit {sha1} --json status,name")
