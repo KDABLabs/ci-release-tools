@@ -244,21 +244,12 @@ def sign_and_upload(proj_name, version, upload=True):
     Pass upload=False (or --no-upload) to only create the .asc file without uploading.
     """
     tag = tag_for_version(proj_name, version)
-    proj = get_project(proj_name)
-    if proj.get('tarball_includes_submodules'):
-        sha1 = sha1_for_tag_remote(proj_name, tag)
-        if not sha1:
-            print(f"error: failed to resolve sha1 for tag {tag}")
-            return False
-        if not utils.create_tarball_with_submodules(proj_name, sha1, version):
-            print(
-                f"error: failed to create tarball with submodules for {proj_name}")
-            return False
-    elif not download_tarball(proj_name, tag, version):
-        print(f"error: failed to download tarball for {proj_name}")
-        return False
 
     tarball = f"{proj_name}-{version}.tar.gz".lower()
+    if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.tar.gz' --clobber"):
+        print(f"error: failed to download tarball for {proj_name} {tag}")
+        return False
+
     if not sign_file(tarball):
         print(f"error: Failed to sign {tarball}")
         return False
@@ -287,20 +278,11 @@ def verify_signature(proj_name, version):
 
     tag = tag_for_version(proj_name, version)
     proj = get_project(proj_name)
-    if proj.get('tarball_includes_submodules'):
-        sha1 = sha1_for_tag_remote(proj_name, tag)
-        if not sha1:
-            print(f"error: failed to resolve sha1 for tag {tag}")
-            return False
-        if not utils.create_tarball_with_submodules(proj_name, sha1, version):
-            print(
-                f"error: failed to create tarball with submodules for {proj_name}")
-            return False
-    elif not download_tarball(proj_name, tag, version):
-        print(f"error: failed to download tarball for {proj_name}")
-        return False
 
     tarball = f"{proj_name}-{version}.tar.gz".lower()
+    if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.tar.gz' --clobber"):
+        print(f"error: failed to download tarball for {proj_name} {tag}")
+        return False
 
     if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.asc' --clobber"):
         print(
