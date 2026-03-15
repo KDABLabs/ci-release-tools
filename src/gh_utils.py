@@ -236,11 +236,12 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign):
     return True
 
 
-def sign_and_upload(proj_name, version):
+def sign_and_upload(proj_name, version, upload=True):
     """
     Since GH actions can't sign, here's a function that signs and uploads
     To be run locally, example:
         ./src/sign_and_upload.py --repo KDDockWidgets --version 2.2.1
+    Pass upload=False (or --no-upload) to only create the .asc file without uploading.
     """
     tag = tag_for_version(proj_name, version)
     proj = get_project(proj_name)
@@ -261,6 +262,10 @@ def sign_and_upload(proj_name, version):
     if not sign_file(tarball):
         print(f"error: Failed to sign {tarball}")
         return False
+
+    if not upload:
+        print(f"Signature written to {tarball}.asc (skipping upload)")
+        return True
 
     if not run_command(f"gh release upload -R KDAB/{proj_name} {tag} {tarball}.asc"):
         print("error: Could not create release")
@@ -288,7 +293,8 @@ def verify_signature(proj_name, version):
             print(f"error: failed to resolve sha1 for tag {tag}")
             return False
         if not utils.create_tarball_with_submodules(proj_name, sha1, version):
-            print(f"error: failed to create tarball with submodules for {proj_name}")
+            print(
+                f"error: failed to create tarball with submodules for {proj_name}")
             return False
     elif not download_tarball(proj_name, tag, version):
         print(f"error: failed to download tarball for {proj_name}")
@@ -297,7 +303,8 @@ def verify_signature(proj_name, version):
     tarball = f"{proj_name}-{version}.tar.gz".lower()
 
     if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.asc' --clobber"):
-        print(f"error: failed to download .asc signature for {proj_name} {tag}")
+        print(
+            f"error: failed to download .asc signature for {proj_name} {tag}")
         return False
 
     if not run_command(f"gpg --verify {tarball}.asc {tarball}"):
@@ -309,7 +316,8 @@ def verify_signature(proj_name, version):
     if proj.get('has_version_txt'):
         with tarfile_module.open(tarball, 'r:gz') as tf:
             member = next(
-                (m for m in tf.getmembers() if m.name.endswith('/version.txt') or m.name == 'version.txt'),
+                (m for m in tf.getmembers() if m.name.endswith(
+                    '/version.txt') or m.name == 'version.txt'),
                 None
             )
             if member is None:
@@ -317,7 +325,8 @@ def verify_signature(proj_name, version):
                 return False
             content = tf.extractfile(member).read().decode().strip()
             if content != version:
-                print(f"error: version.txt contains '{content}' but expected '{version}'")
+                print(
+                    f"error: version.txt contains '{content}' but expected '{version}'")
                 return False
         print(f"version.txt matches: {version}")
 

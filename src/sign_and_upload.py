@@ -18,12 +18,16 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--repo", help="GitHub repository name", required=True)
 parser.add_argument("--version", help="Release version", required=True)
-parser.add_argument("--verify", help="Verify signature instead of signing", action="store_true")
+parser.add_argument(
+    "--verify", help="Verify signature instead of signing", action="store_true")
+parser.add_argument(
+    "--no-upload", help="Sign but do not upload the .asc file", action="store_true")
 args = parser.parse_args()
 
 if args.verify:
     result = verify_signature(args.repo, args.version)
 else:
-    result = sign_and_upload(args.repo, args.version)
+    result = sign_and_upload(args.repo, args.version,
+                             upload=not args.no_upload)
 
 sys.exit(0 if result else -1)

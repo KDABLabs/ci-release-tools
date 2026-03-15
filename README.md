@@ -29,6 +29,11 @@ Scripts related to GitHub, for example:
 ```bash
 python3 src/sign_and_upload.py --repo KDDockWidgets --version 2.2.3
 ```
+### Download and verify tarball signature
+
+```bash
+python3 src/sign_and_upload.py --repo KDSoap --version 2.3.0 --verify
+```
 
 ## Get versions of submodules or FetchContent dependencies
 
