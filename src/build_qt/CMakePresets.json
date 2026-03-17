@@ -42,6 +42,13 @@
       }
     },
     {
+      "name": "static",
+      "inherits" : "profile",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF"
+      }
+    },
+    {
       "name": "asan",
       "inherits": "base",
       "cacheVariables": {
