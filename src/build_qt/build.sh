@@ -44,7 +44,7 @@ if [ ! -d "$QTSRC_DIR" ]; then
 else
     cd "$QTSRC_DIR"
     echo "Updating Qt source directory at '$QTSRC_DIR'"
-    git fetch origin "$QT_VERSION"
+    git fetch origin
     cd ..
 fi
 
@@ -53,6 +53,7 @@ echo "Building Qt $QT_VERSION with preset '$PRESET' in '$PARENT_INSTALL_DIR' fro
 cd "$QTSRC_DIR"/
 git checkout "$QT_VERSION"
 
+echo "Initializing Qt submodules..."
 git submodule update --init --recursive -- . \
         ":(exclude)qtwebengine" \
         ":(exclude)qtpim" \
