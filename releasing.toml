@@ -23,7 +23,7 @@
 signed_release = true
 tarball_includes_submodules = true
 tag_prefix = "kdsoap-"
-homebrew = ["kdsoap-qt5.rb", "kdsoap-qt6.rb"]
+homebrew = ["kdsoap-qt6.rb"]
 main_branch = "master"
 has_version_txt = true
 
@@ -35,13 +35,13 @@ has_version_txt = true
 [project.KDReports]
 signed_release = true
 tag_prefix = "kdreports-"
-homebrew = ["kdreports-qt5.rb", "kdreports-qt6.rb"]
+homebrew = ["kdreports-qt6.rb"]
 main_branch = "master"
 
 [project.KDDockWidgets]
 tag_prefix = "v"
 signed_release = true
-homebrew = ["kddockwidgets-qt5.rb", "kddockwidgets-qt6.rb"]
+homebrew = ["kddockwidgets-qt6.rb"]
 main_branch = "main"
 has_version_txt = true
 
@@ -60,14 +60,14 @@ submodule_path = "3rdparty/graphviz"
 [project.KDSingleApplication]
 tag_prefix = "v"
 signed_release = true
-homebrew = ["kdsingleapplication-qt5.rb", "kdsingleapplication-qt6.rb"]
+homebrew = ["kdsingleapplication-qt6.rb"]
 main_branch = "master"
 has_version_txt = true
 
 [project.GammaRay]
 tag_prefix = "v"
 signed_release = true
-homebrew = ["gammaray-qt5.rb", "gammaray-qt6.rb"]
+homebrew = ["gammaray-qt6.rb"]
 main_branch = "master"
 has_version_txt = true
 last_version_supporting_qt5 = "3.2"
@@ -80,7 +80,7 @@ main_branch = "master"
 [project.KDChart]
 tag_prefix = "v"
 signed_release = true
-homebrew = ["kdchart-qt5.rb", "kdchart-qt6.rb"]
+homebrew = ["kdchart-qt6.rb"]
 main_branch = "master"
 
 [project.KDBindings]
