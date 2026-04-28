@@ -236,30 +236,77 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign):
     return True
 
 
+def download_sign_and_verify(filename, download_cmd):
+    """
+    Downloads a file, signs it, and returns True on success.
+    download_cmd is the shell command to download the file.
+    """
+    if not run_command(download_cmd):
+        print(f"error: failed to download {filename}")
+        return False
+
+    if not sign_file(filename):
+        print(f"error: Failed to sign {filename}")
+        return False
+
+    return True
+
+
+def download_and_verify(filename, download_cmd):
+    """
+    Downloads a file and verifies its .asc signature. Returns True on success.
+    The .asc file must already be present locally.
+    """
+    if not run_command(download_cmd):
+        print(f"error: failed to download {filename}")
+        return False
+
+    print(f"Verifying {filename} with signature {filename}.asc")
+    if not run_command(f"gpg --verify {filename}.asc {filename}"):
+        print(f"error: GPG signature verification failed for {filename}")
+        return False
+
+    print(f"Signature verification successful for {filename}")
+    return True
+
+
 def sign_and_upload(proj_name, version, upload=True):
     """
     Since GH actions can't sign, here's a function that signs and uploads
     To be run locally, example:
         ./src/sign_and_upload.py --repo KDDockWidgets --version 2.2.1
     Pass upload=False (or --no-upload) to only create the .asc file without uploading.
+
+    Signs:
+        1. The release tarball (uploaded as a release asset)
+        2. The GitHub auto-generated .tar.gz archive
+        3. The GitHub auto-generated .zip archive
     """
     tag = tag_for_version(proj_name, version)
-
     tarball = f"{proj_name}-{version}.tar.gz".lower()
-    if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.tar.gz' --clobber"):
-        print(f"error: failed to download tarball for {proj_name} {tag}")
-        return False
+    gh_tarball = f"{tag}.tar.gz"
+    gh_zip = f"{tag}.zip"
+    gh_archive_base = f"https://github.com/KDAB/{proj_name}/archive/refs/tags/{tag}"
 
-    if not sign_file(tarball):
-        print(f"error: Failed to sign {tarball}")
-        return False
+    files = [
+        (tarball,
+         f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.tar.gz' --clobber"),
+        (gh_tarball, f"curl -L -o {gh_tarball} {gh_archive_base}.tar.gz"),
+        (gh_zip, f"curl -L -o {gh_zip} {gh_archive_base}.zip"),
+    ]
+
+    for filename, download_cmd in files:
+        if not download_sign_and_verify(filename, download_cmd):
+            return False
 
     if not upload:
-        print(f"Signature written to {tarball}.asc (skipping upload)")
+        asc_list = ', '.join(f"{f}.asc" for f, _ in files)
+        print(f"Signatures written to {asc_list} (skipping upload)")
         return True
 
-    if not run_command(f"gh release upload -R KDAB/{proj_name} {tag} {tarball}.asc"):
-        print("error: Could not create release")
+    asc_files = ' '.join(f"{f}.asc" for f, _ in files)
+    if not run_command(f"gh release upload -R KDAB/{proj_name} {tag} {asc_files} --clobber"):
+        print("error: Could not upload signatures")
         return False
 
     return True
@@ -267,9 +314,9 @@ def sign_and_upload(proj_name, version, upload=True):
 
 def verify_signature(proj_name, version):
     """
-    Verifies the GPG signature of a released tarball.
-    Downloads the tarball and its .asc signature from the GitHub release, then
-    runs gpg --verify to confirm the signature is valid.
+    Verifies the GPG signatures of a released tarball and the GitHub auto-generated archives.
+    Downloads the tarball, zip, and their .asc signatures from the GitHub release, then
+    runs gpg --verify to confirm the signatures are valid.
     For projects with has_version_txt, also checks version.txt inside the tarball.
     To be run locally, example:
         ./src/sign_and_upload.py --repo KDDockWidgets --version 2.2.1 --verify
@@ -280,20 +327,36 @@ def verify_signature(proj_name, version):
     proj = get_project(proj_name)
 
     tarball = f"{proj_name}-{version}.tar.gz".lower()
+    gh_tarball = f"{tag}.tar.gz"
+    gh_zip = f"{tag}.zip"
+    gh_archive_base = f"https://github.com/KDAB/{proj_name}/archive/refs/tags/{tag}"
+
+    # Download release assets (tarballs and .asc signatures)
     if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.tar.gz' --clobber"):
         print(f"error: failed to download tarball for {proj_name} {tag}")
         return False
 
     if not run_command(f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.asc' --clobber"):
         print(
-            f"error: failed to download .asc signature for {proj_name} {tag}")
+            f"error: failed to download .asc signatures for {proj_name} {tag}")
         return False
 
+    # Verify the release tarball
+    print(f"Verifying {tarball} with signature {tarball}.asc")
     if not run_command(f"gpg --verify {tarball}.asc {tarball}"):
         print(f"error: GPG signature verification failed for {tarball}")
         return False
-
     print(f"Signature verification successful for {tarball}")
+
+    # Verify the GitHub auto-generated archives
+    gh_files = [
+        (gh_tarball, f"curl -L -o {gh_tarball} {gh_archive_base}.tar.gz"),
+        (gh_zip, f"curl -L -o {gh_zip} {gh_archive_base}.zip"),
+    ]
+
+    for filename, download_cmd in gh_files:
+        if not download_and_verify(filename, download_cmd):
+            return False
 
     if proj.get('has_version_txt'):
         with tarfile_module.open(tarball, 'r:gz') as tf:
