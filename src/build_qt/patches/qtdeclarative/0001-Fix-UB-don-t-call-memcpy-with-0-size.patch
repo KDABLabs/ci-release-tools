@@ -1,0 +1,44 @@
+From 4c8b01b68beb510dfc04d35be5a51b1845d5e0cc Mon Sep 17 00:00:00 2001
+From: Sergio Martins <sergio.martins@kdab.com>
+Date: Thu, 14 May 2026 22:09:21 +0100
+Subject: [PATCH] Fix UB: don't call memcpy with 0 size
+
+---
+ src/quick/scenegraph/qsgdistancefieldglyphnode.cpp | 6 ++++--
+ src/quickshapes/qquickshapegenericrenderer.cpp     | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/quick/scenegraph/qsgdistancefieldglyphnode.cpp b/src/quick/scenegraph/qsgdistancefieldglyphnode.cpp
+index b88bd863e8..637c3e0ab0 100644
+--- a/src/quick/scenegraph/qsgdistancefieldglyphnode.cpp
++++ b/src/quick/scenegraph/qsgdistancefieldglyphnode.cpp
+@@ -318,8 +318,10 @@ void QSGDistanceFieldGlyphNode::updateGeometry()
+     qCDebug(lcSgText) << "allocating for" << vp.size() << "vtx (reserved" << likelyGlyphCount * 4 << "):" << vp.size() * sizeof(QSGGeometry::TexturedPoint2D)
+             << "bytes;" << ip.size() << "idx:" << ip.size() * sizeof(quint16) << "bytes; total bytes so far" << m_totalAllocation;
+     g->allocate(vp.size(), ip.size());
+-    memcpy(g->vertexDataAsTexturedPoint2D(), vp.constData(), vp.size() * sizeof(QSGGeometry::TexturedPoint2D));
+-    memcpy(g->indexDataAsUShort(), ip.constData(), ip.size() * sizeof(quint16));
++    if (!vp.isEmpty()) {
++        memcpy(g->vertexDataAsTexturedPoint2D(), vp.constData(), vp.size() * sizeof(QSGGeometry::TexturedPoint2D));
++        memcpy(g->indexDataAsUShort(), ip.constData(), ip.size() * sizeof(quint16));
++    }
+ 
+     setBoundingRect(m_boundingRect);
+     markDirty(DirtyGeometry);
+diff --git a/src/quickshapes/qquickshapegenericrenderer.cpp b/src/quickshapes/qquickshapegenericrenderer.cpp
+index 4185010e42..080df550f6 100644
+--- a/src/quickshapes/qquickshapegenericrenderer.cpp
++++ b/src/quickshapes/qquickshapegenericrenderer.cpp
+@@ -410,7 +410,8 @@ void QQuickShapeGenericRenderer::triangulateFill(const QPainterPath &path,
+         fillIndices->resize(ts.indices.size());
+         indexByteSize = ts.indices.size() * sizeof(quint32);
+     }
+-    memcpy(fillIndices->data(), ts.indices.data(), indexByteSize);
++    if (indexByteSize)
++        memcpy(fillIndices->data(), ts.indices.data(), indexByteSize);
+ }
+ 
+ void QQuickShapeGenericRenderer::triangulateStroke(const QPainterPath &path,
+-- 
+2.48.1
+
