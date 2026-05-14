@@ -84,6 +84,23 @@
         "FEATURE_developer_build": "ON",
         "CMAKE_BUILD_TYPE": "Debug"
       }
+    },
+    {
+      "name": "msan",
+      "inherits": "base",
+      "cacheVariables": {
+        "QT_FEATURE_sanitize_memory": "ON",
+        "FEATURE_developer_build": "ON",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "QT_FEATURE_xcb": "OFF",
+        "FEATURE_opengl": "OFF",
+        "INPUT_dbus": "no",
+        "INPUT_opengl": "no",
+        "QT_FEATURE_dbus": "OFF",
+        "FEATURE_stdlib_libcpp": "ON",
+        "CMAKE_LIBRARY_PATH": "/msan-libs/",
+        "QT_EXTRA_INCLUDEPATHS": "/msan-libs/include"
+      }
     }
   ]
 }

@@ -27,10 +27,10 @@ PARENT_INSTALL_DIR="$3"
 QTSRC_DIR="$4"
 
 case "$PRESET" in
-    asan|asan_ubsan|ubsan|tsan|profile|debug|static)
+    asan|asan_ubsan|ubsan|tsan|msan|profile|debug|static)
         ;;
     *)
-        echo "Error: Invalid preset '$PRESET'. Must be one of: asan, ubsan, tsan, profile, debug, static"
+        echo "Error: Invalid preset '$PRESET'. Must be one of: asan, asan_ubsan, ubsan, tsan, msan, profile, debug, static"
         exit 1
         ;;
 esac
