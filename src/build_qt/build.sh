@@ -1,5 +1,4 @@
-
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-FileCopyrightText: 2026 Klarälvdalens Datakonsult AB, a KDAB Group company <info@kdab.com>
 # SPDX-License-Identifier: MIT
@@ -26,6 +25,14 @@ QT_VERSION="$2"
 PARENT_INSTALL_DIR="$3"
 QTSRC_DIR="$4"
 
+# KDAB repos have patches
+KDAB_REPOS=("qtbase" "qtshadertools" "qtdeclarative" "qtwayland")
+QT_REPOS=("qtsvg" "qt5compat" "qttools" "qtscxml" "qtremoteobjects")
+
+ORDERED_REPOS=("qtbase" "qtsvg" "qtshadertools" "qtdeclarative" "qtwayland" "qt5compat" "qttools" "qtscxml" "qtremoteobjects")
+
+INSTALL_DIR="$PARENT_INSTALL_DIR"/qt-"$QT_VERSION"-"$PRESET"
+
 case "$PRESET" in
     asan|asan_ubsan|ubsan|tsan|msan|profile|debug|static)
         ;;
@@ -39,70 +46,65 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 mkdir -p "$PARENT_INSTALL_DIR"
 
-if [ ! -d "$QTSRC_DIR" ]; then
-    git clone https://github.com/qt/qt5.git -b "$QT_VERSION" --depth 1 --single-branch "$QTSRC_DIR"
-else
-    cd "$QTSRC_DIR"
-    echo "Updating Qt source directory at '$QTSRC_DIR'"
-    git fetch origin
-    cd ..
-fi
+build_qt_module() {
+    local repo="$1"
+
+    cd "$QTSRC_DIR/$repo"
+    mkdir -p "build-${PRESET}" && cd "build-${PRESET}"
+    "${INSTALL_DIR}/bin/qt-cmake" ..
+    ninja -v && ninja install && cd .. && rm -rf "build-${PRESET}"
+}
+
+for repo in "${KDAB_REPOS[@]}"; do
+    REPO_DIR="$QTSRC_DIR/$repo"
+    if [ ! -d "$REPO_DIR" ]; then
+        git clone "kdab:/KDAB/$repo.git" "$REPO_DIR"
+        git -C $REPO_DIR remote add github "https://github.com/qt/$repo.git"
+        git -C $REPO_DIR fetch github
+    else
+        echo "Updating KDAB repo '$repo'"
+        git -C $REPO_DIR fetch origin
+        git -C $REPO_DIR clean -fdx
+    fi
+    if ! git -C $REPO_DIR checkout "kdab/$QT_VERSION"; then
+        # It's also OK to checkout an arbitrary version we don't have patches for, specially when not doing UBSAN
+        git -C $REPO_DIR checkout "$QT_VERSION"
+    fi
+done
+
+for repo in "${QT_REPOS[@]}"; do
+    REPO_DIR="$QTSRC_DIR/$repo"
+    if [ ! -d "$REPO_DIR" ]; then
+        git clone "https://github.com/qt/$repo.git" "$REPO_DIR"
+    else
+        echo "Updating Qt repo '$repo'"
+        git -C $REPO_DIR fetch origin
+        git -C $REPO_DIR clean -fdx
+    fi
+    git -C $REPO_DIR checkout $QT_VERSION
+done
+
+git -C "$QTSRC_DIR/qttools" submodule update --init --recursive
 
 echo "Building Qt $QT_VERSION with preset '$PRESET' in '$PARENT_INSTALL_DIR' from source at '$QTSRC_DIR'"
 
 cd "$QTSRC_DIR"/
-git checkout "$QT_VERSION"
+cp "$SCRIPT_DIR/CMakePresets.json" qtbase/
+cd qtbase
 
-echo "Initializing Qt submodules..."
-git submodule update --init --recursive -- . \
-        ":(exclude)qtwebengine" \
-        ":(exclude)qtpim" \
-        ":(exclude)qttasktree" \
-        ":(exclude)qtsystems" \
-        ":(exclude)qtrepotools" \
-        ":(exclude)qtquicktimeline" \
-        ":(exclude)qtquickeffectmaker" \
-        ":(exclude)qtquick3dphysics" \
-        ":(exclude)qtquick3d" \
-        ":(exclude)qtqa" \
-        ":(exclude)qtopenapi" \
-        ":(exclude)qtopcua" \
-        ":(exclude)qtlottie" \
-        ":(exclude)qthttpserver" \
-        ":(exclude)qtgraphs" \
-        ":(exclude)qtgamepad" \
-        ":(exclude)qtfeedback" \
-        ":(exclude)qtcoap" \
-        ":(exclude)qtcanvas3d" \
-        ":(exclude)qtactiveqt"
-
-cp "$SCRIPT_DIR/CMakePresets.json" .
-
-cd qtdeclarative/
-git am < "$SCRIPT_DIR"/patches/qtdeclarative/0001-fix-build-with-UBSAN.patch || true
-git am < "$SCRIPT_DIR"/patches/qtdeclarative/0003-Fix-undefined-behaviour-when-initializing-TextArea.patch || true
-git am < "$SCRIPT_DIR"/patches/qtdeclarative/0004-Fix-UB-don-t-static-cast-partially-deleted-base-clas.patch || true
-cd ..
-
-cd qtbase/
-git am < "$SCRIPT_DIR"/patches/qtbase/0001-fix-ubsan.patch || true
-git am < "$SCRIPT_DIR"/patches/qtbase/0002-disable-fsanitize-float-divide-by-zero.patch || true
-git am < "$SCRIPT_DIR"/patches/qtbase/0005-WIP-CMake-Pass-fvisibility-default-when-using-fsanit.patch || true
-cd ..
-
-cd qtshadertools/
-git am < "$SCRIPT_DIR"/patches/qtshadertools/0001-Fix-UBSAN-build-due-to-invalid-down-cast.patch || true
-git am < "$SCRIPT_DIR"/patches/qtshadertools/0002-Don-t-build-qsb-with-TSAN.patch || true
-cd ..
-
-cd qtwayland/
-git am < "$SCRIPT_DIR"/patches/qtwayland/0001-compositor-Avoid-overflow-for-infiniteRegion.patch || true
-cd ..
-
-INSTALL_DIR="$PARENT_INSTALL_DIR"/qt-"$QT_VERSION"-"$PRESET"
 BUILD_DIR="build-${PRESET}"
 rm -rf "${INSTALL_DIR}"
 rm -rf "${BUILD_DIR}"
 cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
 cmake --build "$BUILD_DIR"/ --verbose
 cmake --install "$BUILD_DIR"/
+
+for repo in "${ORDERED_REPOS[@]}"; do
+    if [ "$repo" = "qtbase" ]; then
+        continue
+    fi
+
+    build_qt_module "$repo"
+done
+
+strip -s "$INSTALL_DIR"/bin/* || true
