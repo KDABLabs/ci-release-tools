@@ -64,7 +64,10 @@ PACKAGE_NAME=$(basename "$QT_DIR")
 TARBALL="${PACKAGE_NAME}.tar.zst"
 
 echo "Creating tarball '$TARBALL' for Qt directory "$PACKAGE_NAME" ..."
-tar --zstd -cf "$TARBALL" -C "$QT_DIR" .
+tar -I 'zstd -19 -T0' -cf "$TARBALL" -C "$QT_DIR" .
+size_bytes=$(stat -c%s "$TARBALL")
+size_mb=$(awk "BEGIN { printf \"%.2f\", $size_bytes / 1024 / 1024 }")
+echo "Tarball size: ${size_mb} MB"
 
 if gh release view "$GH_RELEASE_NAME" --repo KDABLabs/ci-release-tools >/dev/null 2>&1; then
     echo "Release $GH_RELEASE_NAME already exists; skipping creation."
