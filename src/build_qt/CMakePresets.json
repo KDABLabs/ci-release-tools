@@ -17,7 +17,7 @@
         "QT_FEATURE_icu": "OFF",
         "QT_FEATURE_xcb": "ON",
         "CMAKE_CXX_COMPILER_LAUNCHER":"ccache",
-        "QT_UNITY_BUILD": "ON"
+        "FEATURE_use_mold_linker": "ON"
       }
     },
     {
@@ -54,7 +54,7 @@
       "cacheVariables": {
         "QT_FEATURE_sanitize_address": "ON",
         "FEATURE_developer_build": "ON",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
@@ -64,7 +64,7 @@
         "QT_FEATURE_sanitize_address": "ON",
         "QT_FEATURE_sanitize_undefined": "ON",
         "FEATURE_developer_build": "ON",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
@@ -73,7 +73,7 @@
       "cacheVariables": {
         "QT_FEATURE_sanitize_undefined": "ON",
         "FEATURE_developer_build": "ON",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
@@ -82,7 +82,7 @@
       "cacheVariables": {
         "QT_FEATURE_sanitize_thread": "ON",
         "FEATURE_developer_build": "ON",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
