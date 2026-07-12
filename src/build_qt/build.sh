@@ -64,9 +64,12 @@ for repo in "${KDAB_REPOS[@]}"; do
     else
         echo "Updating KDAB repo '$repo'"
         git -C $REPO_DIR fetch origin
+        git -C $REPO_DIR fetch github
         git -C $REPO_DIR clean -fdx
     fi
-    if ! git -C $REPO_DIR checkout "kdab/$QT_VERSION"; then
+    if git -C $REPO_DIR rev-parse "origin/kdab/$QT_VERSION" -- >/dev/null 2>&1; then
+        git -C $REPO_DIR checkout -B "kdab/$QT_VERSION" "origin/kdab/$QT_VERSION"
+    else
         # It's also OK to checkout an arbitrary version we don't have patches for, specially when not doing UBSAN
         git -C $REPO_DIR checkout "$QT_VERSION"
     fi
@@ -81,7 +84,11 @@ for repo in "${QT_REPOS[@]}"; do
         git -C $REPO_DIR fetch origin
         git -C $REPO_DIR clean -fdx
     fi
-    git -C $REPO_DIR checkout $QT_VERSION
+    if git -C $REPO_DIR rev-parse "origin/$QT_VERSION" -- >/dev/null 2>&1; then
+        git -C $REPO_DIR checkout -B "$QT_VERSION" "origin/$QT_VERSION"
+    else
+        git -C $REPO_DIR checkout "$QT_VERSION"
+    fi
 done
 
 git -C "$QTSRC_DIR/qttools" submodule update --init --recursive
