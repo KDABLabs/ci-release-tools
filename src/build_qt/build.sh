@@ -52,7 +52,7 @@ build_qt_module() {
     cd "$QTSRC_DIR/$repo"
     mkdir -p "build-${PRESET}" && cd "build-${PRESET}"
     "${INSTALL_DIR}/bin/qt-cmake" ..
-    ninja -v && ninja install && cd .. && rm -rf "build-${PRESET}"
+    ninja -v && ninja install && cp compile_commands.json .. && cd ..
 }
 
 for repo in "${KDAB_REPOS[@]}"; do
@@ -105,6 +105,7 @@ rm -rf "${BUILD_DIR}"
 cmake --preset="$PRESET" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
 cmake --build "$BUILD_DIR"/ --verbose
 cmake --install "$BUILD_DIR"/
+cp "${BUILD_DIR}"/compile_commands.json $QTSRC_DIR/qtbase/
 
 for repo in "${ORDERED_REPOS[@]}"; do
     if [ "$repo" = "qtbase" ]; then
