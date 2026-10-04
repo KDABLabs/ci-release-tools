@@ -15,15 +15,15 @@ error_handler() {
 trap error_handler EXIT
 
 if [ $# -ne 4 ]; then
-    echo "Usage: $0 <preset> <qt-version> <parent-install-dir> <qtsrc-dir>"
+    echo "Usage: $0 <preset> <qt-version> <qtsrc-dir> <parent-install-dir>"
     echo "  preset: asan, asan_ubsan, ubsan, tsan, profile, debug, or static"
     exit 1
 fi
 
 PRESET="$1"
 QT_VERSION="$2"
-PARENT_INSTALL_DIR="$3"
-QTSRC_DIR="$4"
+QTSRC_DIR="$3"
+PARENT_INSTALL_DIR="$4"
 
 # KDAB repos have patches
 KDAB_REPOS=("qtbase" "qtshadertools" "qtdeclarative" "qtwayland")
