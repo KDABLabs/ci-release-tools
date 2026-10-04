@@ -290,7 +290,7 @@ def sign_and_upload(proj_name, version, upload=True):
 
     files = [
         (tarball,
-         f"gh release download {tag} --repo KDAB/{proj_name} --pattern '*.tar.gz' --clobber"),
+         f"curl -fL -o {tarball} https://github.com/KDAB/{proj_name}/releases/download/{tag}/{tarball}"),
         (gh_tarball, f"curl -L -o {gh_tarball} {gh_archive_base}.tar.gz"),
         (gh_zip, f"curl -L -o {gh_zip} {gh_archive_base}.zip"),
     ]
