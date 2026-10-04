@@ -15,8 +15,8 @@ QT_TAG=$1
 QT_SRC_DIR=$2
 QT_PARENT_INSTALL_DIR=$3
 
-./build.sh asan "$QT_TAG" "$QT_PARENT_INSTALL_DIR" "$QT_SRC_DIR" && \
-./build.sh ubsan "$QT_TAG" "$QT_PARENT_INSTALL_DIR" "$QT_SRC_DIR" && \
-./build.sh tsan "$QT_TAG" "$QT_PARENT_INSTALL_DIR" "$QT_SRC_DIR" && \
-./build.sh debug "$QT_TAG" "$QT_PARENT_INSTALL_DIR" "$QT_SRC_DIR" && \
-./build.sh profile "$QT_TAG" "$QT_PARENT_INSTALL_DIR" "$QT_SRC_DIR"
+./build.sh asan "$QT_TAG" "$QT_SRC_DIR" "$QT_PARENT_INSTALL_DIR" && \
+./build.sh ubsan "$QT_TAG" "$QT_SRC_DIR" "$QT_PARENT_INSTALL_DIR" && \
+./build.sh tsan "$QT_TAG" "$QT_SRC_DIR" "$QT_PARENT_INSTALL_DIR" && \
+./build.sh debug "$QT_TAG" "$QT_SRC_DIR" "$QT_PARENT_INSTALL_DIR" && \
+./build.sh profile "$QT_TAG" "$QT_SRC_DIR" "$QT_PARENT_INSTALL_DIR"
