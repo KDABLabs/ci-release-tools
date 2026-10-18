@@ -15,6 +15,7 @@
 import json
 import argparse
 import re
+import shlex
 import sys
 import tarfile
 import uuid
@@ -228,7 +229,7 @@ def create_release(repo, version, sha1, notes, repo_path, should_sign):
     cmd = f"gh release create {tag} " \
         f"--repo KDAB/{repo} " \
         f'--title "Release {tag}" ' \
-        f'--notes "{notes}" ' + files_to_upload
+        f'--notes {shlex.quote(notes)} ' + files_to_upload
 
     if not run_command(cmd):
         print("error: Could not create release")
