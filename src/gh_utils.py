@@ -16,6 +16,7 @@ import json
 import argparse
 import re
 import sys
+import tarfile
 import uuid
 from utils import get_projects, repo_exists, run_command, run_command_with_output, run_command_silent, tag_for_version, get_project, get_submodule_builtin_dependencies
 import utils
@@ -321,8 +322,6 @@ def verify_signature(proj_name, version):
     To be run locally, example:
         ./src/sign_and_upload.py --repo KDDockWidgets --version 2.2.1 --verify
     """
-    import tarfile as tarfile_module
-
     tag = tag_for_version(proj_name, version)
     proj = get_project(proj_name)
 
@@ -359,7 +358,7 @@ def verify_signature(proj_name, version):
             return False
 
     if proj.get('has_version_txt'):
-        with tarfile_module.open(tarball, 'r:gz') as tf:
+        with tarfile.open(tarball, 'r:gz') as tf:
             member = next(
                 (m for m in tf.getmembers() if m.name.endswith(
                     '/version.txt') or m.name == 'version.txt'),
